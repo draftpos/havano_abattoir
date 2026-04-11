@@ -1,0 +1,18 @@
+{
+ "color": "Orange",
+ "creation": "2026-04-10 12:50:27.000000",
+ "docstatus": 0,
+ "doctype": "Number Card",
+ "document_type": "Receiving",
+ "dynamic_filters_json": "[]",
+ "filters_json": "[[\"Receiving\",\"dispatch_status\",\"!=\",\"Fully Dispatched\"],[\"Receiving\",\"docstatus\",\"=\",\"1\"]]",
+ "function": "Count",
+ "idx": 0,
+ "is_public": 1,
+ "label": "Pending Batches",
+ "modified": "2026-04-10 12:50:27.000000",
+ "modified_by": "Administrator",
+ "module": "Havano Abattoir",
+ "name": "Pending Batches",
+ "owner": "Administrator"
+}

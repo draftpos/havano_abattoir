@@ -1,0 +1,21 @@
+{
+ "aggregate_function_based_on": "total_live_birds",
+ "color": "Indigo",
+ "creation": "2026-04-10 12:50:27.000000",
+ "docstatus": 0,
+ "doctype": "Number Card",
+ "document_type": "Receiving",
+ "dynamic_filters_json": "[]",
+ "filters_json": "[[\"Receiving\",\"docstatus\",\"=\",\"1\"],[\"Receiving\",\"date\",\"=\",\"Today\"]]",
+ "function": "Sum",
+ "idx": 0,
+ "is_public": 1,
+ "label": "Total Birds Received Today",
+ "modified": "2026-04-10 12:50:27.000000",
+ "modified_by": "Administrator",
+ "module": "Havano Abattoir",
+ "name": "Total Birds Received Today",
+ "owner": "Administrator",
+ "show_percentage_stats": 1,
+ "stats_time_interval": "Daily"
+}

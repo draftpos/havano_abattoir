@@ -1,0 +1,20 @@
+{
+ "chart_name": "Dispatch Type Mix",
+ "chart_type": "Group By",
+ "creation": "2026-04-11 08:35:00.000000",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart",
+ "document_type": "Dispatch",
+ "filters_json": "[]",
+ "group_by_based_on": "dispatch_type",
+ "group_by_type": "Count",
+ "idx": 0,
+ "is_public": 1,
+ "is_standard": 1,
+ "modified": "2026-04-11 08:35:00.000000",
+ "modified_by": "Administrator",
+ "module": "Havano Abattoir",
+ "name": "Dispatch Type Mix",
+ "owner": "Administrator",
+ "type": "Donut"
+}

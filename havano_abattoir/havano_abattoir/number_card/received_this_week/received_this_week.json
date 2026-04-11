@@ -1,0 +1,19 @@
+{
+ "aggregate_function_based_on": "total_live_birds",
+ "color": "Indigo",
+ "creation": "2026-04-11 08:35:00.000000",
+ "docstatus": 0,
+ "doctype": "Number Card",
+ "document_type": "Receiving",
+ "dynamic_filters_json": "[]",
+ "filters_json": "[[\"Receiving\",\"docstatus\",\"=\",\"1\"],[\"Receiving\",\"date\",\"=\",\"this week\"]]",
+ "function": "Sum",
+ "idx": 0,
+ "is_public": 1,
+ "label": "Received (This Week)",
+ "modified": "2026-04-11 08:35:00.000000",
+ "modified_by": "Administrator",
+ "module": "Havano Abattoir",
+ "name": "Received This Week",
+ "owner": "Administrator"
+}
