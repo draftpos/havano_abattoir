@@ -162,24 +162,27 @@ function set_receiving_baselines(frm, auto_fill = false) {
 function show_dispatch_type_dialog(frm, auto_submit = false) {
     let d = new frappe.ui.Dialog({
         title: '🐔 Select Dispatch Type',
-        fields: [{
-            fieldtype: 'HTML',
-            options: `<div style="padding:10px 0;font-size:14px;color:#555;">Choose how this batch is being dispatched:</div>`
-        }],
-        primary_action_label: '✅ Unbrining (Direct Dispatch)',
-        primary_action: function () { 
-            frm.set_value('dispatch_type', 'Unbrining'); 
-            d.hide(); 
-            if (auto_submit) {
-                frm.savesubmit();
-            } else {
-                frm.save();
+        fields: [
+            {
+                fieldtype: 'HTML',
+                options: `<div style="padding:10px 0 6px;font-size:14px;color:#555;">Choose how this batch is being dispatched:</div>`
+            },
+            {
+                label: 'Dispatch Type',
+                fieldname: 'dispatch_type',
+                fieldtype: 'Select',
+                options: '\nUnbrining\nBrining',
+                reqd: 1
             }
-        },
-        secondary_action_label: '🧊 Brining (Add Weight)',
-        secondary_action: function () { 
-            frm.set_value('dispatch_type', 'Brining'); 
-            d.hide(); 
+        ],
+        primary_action_label: '✅ Confirm',
+        primary_action: function (values) {
+            if (!values.dispatch_type) {
+                frappe.msgprint(__('Please select a Dispatch Type.'));
+                return;
+            }
+            frm.set_value('dispatch_type', values.dispatch_type);
+            d.hide();
             if (auto_submit) {
                 frm.savesubmit();
             } else {

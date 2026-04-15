@@ -3,11 +3,11 @@ frappe.ui.form.on('Receiving', {
         if (frm.is_new()) {
             frm.set_value('date', frappe.datetime.get_today());
             frm.set_value('time', frappe.datetime.now_time());
-            
+
             // Auto-fetch the next sheet number instantly
             frappe.call({
                 method: 'havano_abattoir.havano_abattoir.doctype.receiving.receiving.get_next_sheet_no',
-                callback: function(r) {
+                callback: function (r) {
                     if (r.message && !frm.doc.sheet_no) {
                         frm.set_value('sheet_no', r.message);
                     }
@@ -217,7 +217,7 @@ function render_custom_form(frm) {
 
     // Initialize root
     let $root = $('<div id="receiving-custom-root">').html(html);
-    
+
     // Insert after page-head
     let $page_head = $(frm.wrapper).find('.page-head');
     if ($page_head.length) {
