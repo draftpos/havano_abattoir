@@ -5,7 +5,7 @@
  "doctype": "Number Card",
  "document_type": "Receiving",
  "dynamic_filters_json": "[]",
- "filters_json": "[[\"Receiving\",\"dispatch_status\",\"!=\",\"Fully Dispatched\"],[\"Receiving\",\"docstatus\",\"=\",\"1\"]]",
+ "filters_json": "[[\"Receiving\",\"processing_status\",\"!=\",\"Fully Processed\"],[\"Receiving\",\"docstatus\",\"=\",\"1\"]]",
  "function": "Count",
  "idx": 0,
  "is_public": 1,

@@ -33,7 +33,7 @@
  "modified": "2026-04-10 13:55:28.021523",
  "modified_by": "Administrator",
  "module": "Havano Abattoir",
- "name": "Dispatch Item",
+ "name": "Processing Item",
  "owner": "Administrator",
  "permissions": [],
  "row_format": "Dynamic",

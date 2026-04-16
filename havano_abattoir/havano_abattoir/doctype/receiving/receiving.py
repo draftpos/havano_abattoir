@@ -35,24 +35,24 @@ class Receiving(Document):
         self.average_live_weight = round(total_kgs / total_birds, 3) if total_birds > 0 else 0
 
     @frappe.whitelist()
-    def sync_dispatch_status(self):
-        # Sum total_units from all submitted Dispatches linked to this Receiving
-        total_dispatched = frappe.db.get_value("Dispatch", 
+    def sync_processing_status(self):
+        # Sum total_units from all submitted Processings linked to this Receiving
+        total_processed = frappe.db.get_value("Processing", 
             {"linked_receiving": self.name, "docstatus": 1}, 
             "sum(total_units)") or 0
         
-        self.total_dispatched_units = total_dispatched
+        self.total_processed_units = total_processed
         total_birds = self.total_live_birds or 0
 
-        if total_dispatched <= 0:
-            self.dispatch_status = "Open"
-        elif total_dispatched < total_birds:
-            self.dispatch_status = "Partially Dispatched"
+        if total_processed <= 0:
+            self.processing_status = "Open"
+        elif total_processed < total_birds:
+            self.processing_status = "Partially Processed"
         else:
-            self.dispatch_status = "Fully Dispatched"
+            self.processing_status = "Fully Processed"
 
         self.save(ignore_permissions=True)
-        return self.dispatch_status
+        return self.processing_status
 
 @frappe.whitelist()
 def get_next_sheet_no():

@@ -21,13 +21,19 @@ frappe.ui.form.on('Receiving', {
         }
 
         if (!frm.is_new()) {
-            frm.add_custom_button(__('Sync Dispatch Status'), function () {
-                frm.call('sync_dispatch_status').then(r => {
+            frm.add_custom_button(__('Sync Processing Status'), function () {
+                frm.call('sync_processing_status').then(r => {
                     frappe.show_alert({ message: __('Status Updated: {0}', [r.message]), indicator: 'green' });
                     frm.refresh();
                 });
             }, __('Actions'));
         }
+
+        // Enable "Link Title" view for standard fetching/naming
+        const link_fields = ['customer_name', 'customer_rep', 'foreperson', 'security'];
+        link_fields.forEach(f => {
+            frm.set_df_property(f, 'show_title_field_in_link', 1);
+        });
 
         // Only rebuild the layout when switching to a different document.
         if (frm.custom_ui_doc !== frm.doc.name) {
@@ -98,45 +104,17 @@ function render_custom_form(frm) {
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
         }
         .rcv-head {
+            border-radius: 10px 10px 0 0;
             padding: 14px 20px;
             background: #f8fafc;
             border-bottom: 1px solid #e2e8f0;
-            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .rcv-title { font-size: 15px; font-weight: 700; color: #334155; margin: 0; display: flex; align-items: center; gap: 8px; }
         .rcv-body { padding: 20px; }
 
-        /* ── Compact child table grid ─────────────────────────── */
-        .rcv-card .grid-heading-row .row,
-        .rcv-card .data-row.row {
-            display: flex !important;
-            align-items: center !important;
-            flex-wrap: nowrap !important;
-        }
-        .rcv-card .grid-heading-row .row > [class*="col-"],
-        .rcv-card .data-row.row > [class*="col-"] {
-            flex: 1 1 0 !important;
-            width: auto !important;
-            min-width: 0 !important;
-            max-width: none !important;
-            float: none !important;
-        }
-        .rcv-card .col.row-check,
-        .rcv-card .col.row-index {
-            flex: 0 0 28px !important;
-            max-width: 28px !important;
-            min-width: 28px !important;
-        }
-        /* Proportional widths for Receiving fields */
-        .rcv-card [data-fieldname="live_units"],
-        .rcv-card [data-fieldname="kg"] {
-            flex: 1.5 1 0 !important;
-        }
-
-        .rcv-card .grid-body .data-row .col,
-        .rcv-card .grid-heading-row .col { padding: 4px 6px !important; }
-        .rcv-card .grid-footer .btn { padding: 4px 10px !important; font-size: 12px !important; }
-        
         /* Summary Styling */
         .summary-box {
             background: #fdf2f2;
@@ -146,6 +124,9 @@ function render_custom_form(frm) {
             height: 100%;
         }
         .summary-label { font-size: 12px; font-weight: 600; color: #991b1b; text-transform: uppercase; margin-bottom: 8px; }
+        
+        /* Cleanup Link UI in cards */
+        .rcv-body .frappe-control { margin-bottom: 10px; }
     </style>
 
     <!-- Card 1: Receiving Information -->
@@ -196,21 +177,15 @@ function render_custom_form(frm) {
                 </div>
                 <div class="col-md-3">
                     <div class="summary-box" style="background:#fff7ed; border-color:#fdba74;">
-                        <div class="summary-label" style="color:#9a3412;">Dispatch Status</div>
-                        <div id="ph-dispatch_status"></div>
+                        <div class="summary-label" style="color:#9a3412;">Processing Status</div>
+                        <div id="ph-processing_status"></div>
                     </div>
                 </div>
             </div>
-            <div class="row" style="margin-bottom:15px;" id="dispatched-progress-row">
-                <div class="col-md-12">
-                   <div style="font-size:11px; color:#64748b; margin-bottom:4px;"><b>Birds Dispatched So Far</b></div>
-                   <div id="ph-total_dispatched_units" style="font-weight:700; font-size:16px;"></div>
-                </div>
-            </div>
             <div class="row">
-                <div class="col-md-4" id="ph-customer_rep"></div>
-                <div class="col-md-4" id="ph-foreperson"></div>
-                <div class="col-md-4" id="ph-security"></div>
+                <div class="col-md-4"><div id="ph-customer_rep"></div></div>
+                <div class="col-md-4"><div id="ph-foreperson"></div></div>
+                <div class="col-md-4"><div id="ph-security"></div></div>
             </div>
         </div>
     </div>`;
@@ -230,8 +205,7 @@ function render_custom_form(frm) {
     let scalar_fields = [
         'date', 'time', 'sheet_no', 'customer_name', 'ambient_temperature',
         'total_live_birds', 'total_kgs', 'average_live_weight',
-        'dispatch_status', 'total_dispatched_units',
-        'customer_rep', 'foreperson', 'security'
+        'processing_status', 'customer_rep', 'foreperson', 'security'
     ];
     scalar_fields.forEach(fname => {
         let f = frm.fields_dict[fname];

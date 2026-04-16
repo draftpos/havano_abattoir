@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class DispatchItem(Document):
+class ProcessingItem(Document):
 	pass

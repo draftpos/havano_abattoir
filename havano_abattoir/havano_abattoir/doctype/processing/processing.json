@@ -1,0 +1,616 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "HAV-DSP-.YYYY.-.####",
+ "creation": "2026-04-10 12:55:10.593913",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_custom_layout",
+  "custom_processing_layout",
+  "date",
+  "column_break_bmhd",
+  "time",
+  "column_break_vdwg",
+  "sheet_no",
+  "column_break_llvf",
+  "customer_name",
+  "column_break_ylyk",
+  "product",
+  "linked_receiving_section",
+  "linked_receiving",
+  "workflow_next_step",
+  "section_break_weights",
+  "weight_label_1",
+  "processing_items_1",
+  "amended_from",
+  "col_break_w1",
+  "weight_label_2",
+  "processing_items_2",
+  "col_break_w2",
+  "weight_label_3",
+  "processing_items_3",
+  "col_break_w3",
+  "weight_label_4",
+  "processing_items_4",
+  "section_break_extra",
+  "weight_label_7",
+  "processing_items_7",
+  "weight_group_5_label_copy",
+  "weight_group_5_copy",
+  "col_break_w7",
+  "weight_label_8",
+  "processing_items_8",
+  "column_break_tjwo",
+  "weight_group_7_label",
+  "weight_group_7",
+  "section_break_totals",
+  "total_bags",
+  "col_break_t1",
+  "units_per_kg",
+  "col_break_t2",
+  "total_units",
+  "col_break_t3",
+  "total_kgs",
+  "col_break_extra_total",
+  "customer_rep",
+  "col_break_t4",
+  "foreperson",
+  "col_break_t5",
+  "security",
+  "section_break_offal",
+  "heads",
+  "col_break_o1",
+  "feet",
+  "col_break_o2",
+  "giz",
+  "col_break_o3",
+  "neck",
+  "col_break_o4",
+  "liver",
+  "col_break_o5",
+  "heart",
+  "col_break_o6",
+  "crop",
+  "col_break_o7",
+  "casings",
+  "section_break_variance",
+  "variance_heads",
+  "col_break_v1",
+  "variance_feet",
+  "col_break_v2",
+  "variance_giz",
+  "col_break_v3",
+  "variance_neck",
+  "col_break_v4",
+  "variance_liver",
+  "col_break_v5",
+  "variance_heart",
+  "col_break_v6",
+  "variance_crop",
+  "col_break_v7",
+  "variance_casings",
+  "section_break_status",
+  "column_break_zzel",
+  "column_break_acgy"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_custom_layout",
+   "fieldtype": "Section Break",
+   "hide_border": 1
+  },
+  {
+   "fieldname": "custom_processing_layout",
+   "fieldtype": "HTML",
+   "label": "Custom Layout"
+  },
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "default": "now",
+   "fieldname": "time",
+   "fieldtype": "Time",
+   "label": "Time",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sheet_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Sheet No",
+   "reqd": 1
+  },
+  {
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Customer Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "product",
+   "fieldtype": "Data",
+   "label": "Product",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_weights",
+   "fieldtype": "Section Break",
+   "label": "Weight Groups (Primary)"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_extra",
+   "fieldtype": "Section Break",
+   "label": "Additional Weight Groups"
+  },
+  {
+   "fieldname": "section_break_totals",
+   "fieldtype": "Section Break",
+   "label": "Totals & Staff"
+  },
+  {
+   "fieldname": "total_bags",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Total Bags",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_t1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "units_per_kg",
+   "fieldtype": "Float",
+   "label": "Units Per KG",
+   "precision": "3",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_t2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_units",
+   "fieldtype": "Int",
+   "label": "Total Units",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "col_break_t3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_kgs",
+   "fieldtype": "Float",
+   "label": "Total KG",
+   "precision": "3",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "col_break_extra_total",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer_rep",
+   "fieldtype": "Link",
+   "label": "Customer Rep",
+   "options": "User",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "col_break_t4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "foreperson",
+   "fieldtype": "Link",
+   "label": "Foreperson",
+   "options": "User",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "col_break_t5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "security",
+   "fieldtype": "Link",
+   "label": "Security",
+   "options": "User",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "section_break_offal",
+   "fieldtype": "Section Break",
+   "label": "Offal / Parts (Actual)"
+  },
+  {
+   "fieldname": "heads",
+   "fieldtype": "Int",
+   "label": "Heads"
+  },
+  {
+   "fieldname": "col_break_o1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "feet",
+   "fieldtype": "Int",
+   "label": "Feet"
+  },
+  {
+   "fieldname": "col_break_o2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "giz",
+   "fieldtype": "Int",
+   "label": "Giz"
+  },
+  {
+   "fieldname": "col_break_o3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "neck",
+   "fieldtype": "Int",
+   "label": "Neck"
+  },
+  {
+   "fieldname": "col_break_o4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "liver",
+   "fieldtype": "Int",
+   "label": "Liver"
+  },
+  {
+   "fieldname": "col_break_o5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "heart",
+   "fieldtype": "Int",
+   "label": "Heart"
+  },
+  {
+   "fieldname": "col_break_o6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "crop",
+   "fieldtype": "Int",
+   "label": "Crop"
+  },
+  {
+   "fieldname": "col_break_o7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "casings",
+   "fieldtype": "Int",
+   "label": "Casings"
+  },
+  {
+   "fieldname": "section_break_variance",
+   "fieldtype": "Section Break",
+   "label": "Variance (Expected vs Actual)"
+  },
+  {
+   "fieldname": "variance_heads",
+   "fieldtype": "Int",
+   "label": "Heads Variance",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_v1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "variance_feet",
+   "fieldtype": "Int",
+   "label": "Feet Variance",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_v2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "variance_giz",
+   "fieldtype": "Int",
+   "label": "Giz Variance",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_v3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "variance_neck",
+   "fieldtype": "Int",
+   "label": "Neck Variance",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_v4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "variance_liver",
+   "fieldtype": "Int",
+   "label": "Liver Variance",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_v5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "variance_heart",
+   "fieldtype": "Int",
+   "label": "Heart Variance",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_v6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "variance_crop",
+   "fieldtype": "Int",
+   "label": "Crop Variance",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_v7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "variance_casings",
+   "fieldtype": "Int",
+   "label": "Casings Variance",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_status",
+   "fieldtype": "Section Break",
+   "label": "Processing Status"
+  },
+  {
+   "fieldname": "linked_receiving",
+   "fieldtype": "Link",
+   "label": "Linked Receiving",
+   "options": "Receiving"
+  },
+  {
+   "fieldname": "workflow_next_step",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Workflow Next Step",
+   "no_copy": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Processing",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "column_break_bmhd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_vdwg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_llvf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ylyk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_zzel",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_acgy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "weight_label_1",
+   "fieldtype": "Data",
+   "label": "Weight Group(kg)"
+  },
+  {
+   "fieldname": "processing_items_1",
+   "fieldtype": "Table",
+   "label": "Weight Group",
+   "options": "Processing Item"
+  },
+  {
+   "fieldname": "col_break_w1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "weight_label_2",
+   "fieldtype": "Data",
+   "label": "Weight Group(kg)"
+  },
+  {
+   "fieldname": "processing_items_2",
+   "fieldtype": "Table",
+   "label": "Weight Group",
+   "options": "Processing Item"
+  },
+  {
+   "fieldname": "col_break_w2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "weight_label_3",
+   "fieldtype": "Data",
+   "label": "Weight Group(kg)"
+  },
+  {
+   "fieldname": "processing_items_3",
+   "fieldtype": "Table",
+   "label": "Weight Group",
+   "options": "Processing Item"
+  },
+  {
+   "fieldname": "col_break_w3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "weight_label_4",
+   "fieldtype": "Data",
+   "label": "Weight Group(kg)"
+  },
+  {
+   "fieldname": "processing_items_4",
+   "fieldtype": "Table",
+   "label": "Weight Group",
+   "options": "Processing Item"
+  },
+  {
+   "fieldname": "weight_label_7",
+   "fieldtype": "Data",
+   "label": "Weight Group(kg)"
+  },
+  {
+   "fieldname": "processing_items_7",
+   "fieldtype": "Table",
+   "label": "Weight Group",
+   "options": "Processing Item"
+  },
+  {
+   "fieldname": "col_break_w7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "weight_label_8",
+   "fieldtype": "Data",
+   "label": "Weight Group(kg)"
+  },
+  {
+   "fieldname": "processing_items_8",
+   "fieldtype": "Table",
+   "label": "Weight Group",
+   "options": "Processing Item"
+  },
+  {
+   "fieldname": "linked_receiving_section",
+   "fieldtype": "Section Break",
+   "label": "Linked Receiving"
+  },
+  {
+   "fieldname": "column_break_tjwo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "weight_group_7_label",
+   "fieldtype": "Data",
+   "label": "Weight Group(kg)"
+  },
+  {
+   "fieldname": "weight_group_7",
+   "fieldtype": "Table",
+   "label": "Weight Group",
+   "options": "Processing Item"
+  },
+  {
+   "fieldname": "weight_group_5_label_copy",
+   "fieldtype": "Data",
+   "label": "Weight Group(kg)"
+  },
+  {
+   "fieldname": "weight_group_5_copy",
+   "fieldtype": "Table",
+   "label": "Weight Group",
+   "options": "Processing Item"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-04-16 13:31:42.651734",
+ "modified_by": "Administrator",
+ "module": "Havano Abattoir",
+ "name": "Processing",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "School User",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "search_fields": "sheet_no,customer_name,foreperson,date",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "sheet_no"
+}
