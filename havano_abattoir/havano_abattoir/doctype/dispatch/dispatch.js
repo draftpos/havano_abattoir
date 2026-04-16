@@ -106,7 +106,7 @@ frappe.ui.form.on('Dispatch Item', {
             multiplier = frm.rcv_avg_weight;
         }
 
-        if (row.units && multiplier > 0) {
+        if (row.units && multiplier > 0 && frm.doc.dispatch_type !== 'Brining') {
             frappe.model.set_value(cdt, cdn, 'kg', parseFloat((row.units * multiplier).toFixed(3)));
         }
         calculate_totals(frm);
@@ -183,10 +183,11 @@ function show_dispatch_type_dialog(frm, auto_submit = false) {
             }
             frm.set_value('dispatch_type', values.dispatch_type);
             d.hide();
-            if (auto_submit) {
+            if (auto_submit && values.dispatch_type !== 'Brining') {
                 frm.savesubmit();
             } else {
                 frm.save();
+                frappe.msgprint(__('You can now manually edit the tables for Brining dispatch. Click Submit when done.'));
             }
         }
     });
