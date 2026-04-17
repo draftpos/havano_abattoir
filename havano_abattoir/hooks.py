@@ -5,6 +5,20 @@ app_description = "Havano Abattoir App"
 app_email = "makonia20@gmail.com"
 app_license = "mit"
 
+# Fixtures
+# --------
+# Export these DocTypes as fixtures (bundled with the app)
+fixtures = [
+    {
+        "dt": "DocType",
+        "filters": [["module", "=", "Havano Abattoir"]]
+    },
+    {
+        "dt": "Workspace",
+        "filters": [["module", "=", "Havano Abattoir"]]
+    }
+]
+
 # Apps
 # ------------------
 

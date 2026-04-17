@@ -207,6 +207,7 @@
    "fieldtype": "Link",
    "label": "Customer Rep",
    "options": "User",
+   "show_title_field_in_link": 1,
    "in_list_view": 1
   },
   {
@@ -218,6 +219,7 @@
    "fieldtype": "Link",
    "label": "Foreperson",
    "options": "User",
+   "show_title_field_in_link": 1,
    "in_list_view": 1
   },
   {
@@ -229,6 +231,7 @@
    "fieldtype": "Link",
    "label": "Security",
    "options": "User",
+   "show_title_field_in_link": 1,
    "in_list_view": 1
   },
   {
