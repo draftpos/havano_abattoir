@@ -13,13 +13,13 @@
    "label": "Dispatch Type Mix"
   }
  ],
- "content": "[{\"id\":\"header_main\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Havano Abattoir Dashboard</b></span>\",\"col\":12}},{\"id\":\"shortcut_row\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Received (Today)\",\"col\":4}},{\"id\":\"shortcut_row2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Received (This Week)\",\"col\":4}},{\"id\":\"shortcut_row3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Received (This Month)\",\"col\":4}},{\"id\":\"shortcut_row4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dispatched (Today)\",\"col\":4}},{\"id\":\"shortcut_row5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dispatched (This Week)\",\"col\":4}},{\"id\":\"shortcut_row6\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dispatched (This Month)\",\"col\":4}},{\"id\":\"chart_r\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Receiving Trend\",\"col\":6}},{\"id\":\"chart_d\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Dispatch Trend\",\"col\":6}},{\"id\":\"chart_pie\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Dispatch Type Mix\",\"col\":12}},{\"id\":\"card_docs\",\"type\":\"card\",\"data\":{\"card_name\":\"Abattoir Documents\",\"col\":12}}]",
- "creation": "2026-04-11 08:35:00",
+ "content": "[{\"id\":\"header_main\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Havano Abattoir Dashboard</b></span>\",\"col\":12}},{\"id\":\"shortcut_row\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Received (Today)\",\"col\":4}},{\"id\":\"shortcut_row2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Received (This Week)\",\"col\":4}},{\"id\":\"shortcut_row3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Received (This Month)\",\"col\":4}},{\"id\":\"chart_r\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Receiving Trend\",\"col\":6}},{\"id\":\"chart_d\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Dispatch Trend\",\"col\":6}},{\"id\":\"chart_pie\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Dispatch Type Mix\",\"col\":12}},{\"id\":\"card_docs\",\"type\":\"card\",\"data\":{\"card_name\":\"Abattoir Documents\",\"col\":12}}]",
+ "creation": "2026-04-17 08:35:15.347510",
  "custom_blocks": [],
  "docstatus": 0,
  "doctype": "Workspace",
  "hide_custom": 0,
- "idx": 1,
+ "idx": 0,
  "indicator_color": "green",
  "is_hidden": 0,
  "label": "Havano Abattoir Dashboard",
@@ -73,7 +73,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-04-17 07:58:07.230976",
+ "modified": "2026-04-17 08:38:57.543746",
  "modified_by": "Administrator",
  "module": "Havano Abattoir",
  "name": "Havano Abattoir Dashboard",
@@ -102,27 +102,6 @@
    "color": "Blue",
    "label": "Received (This Month)",
    "link_to": "Receiving",
-   "stats_filter": "{\"date\": [\"timespan\", \"this month\"], \"docstatus\": [\"!=\", 2]}",
-   "type": "DocType"
-  },
-  {
-   "color": "Green",
-   "label": "Processing (Today)",
-   "link_to": "Processing",
-   "stats_filter": "{\"date\": [\"timespan\", \"today\"], \"docstatus\": [\"!=\", 2]}",
-   "type": "DocType"
-  },
-  {
-   "color": "Green",
-   "label": "Processing (This Week)",
-   "link_to": "Processing",
-   "stats_filter": "{\"date\": [\"timespan\", \"this week\"], \"docstatus\": [\"!=\", 2]}",
-   "type": "DocType"
-  },
-  {
-   "color": "Green",
-   "label": "Processing (This Month)",
-   "link_to": "Processing",
    "stats_filter": "{\"date\": [\"timespan\", \"this month\"], \"docstatus\": [\"!=\", 2]}",
    "type": "DocType"
   }
