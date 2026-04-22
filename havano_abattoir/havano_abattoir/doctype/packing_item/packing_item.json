@@ -1,0 +1,71 @@
+{
+ "actions": [],
+ "creation": "2026-04-21 14:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "classification",
+  "total_available_birds",
+  "column_break_1",
+  "no_of_sacks",
+  "birds_per_sack_dropdown",
+  "total_packed_birds",
+  "birds_per_sack"
+ ],
+ "fields": [
+  {
+   "fieldname": "classification",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Classification",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_available_birds",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Available Birds",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "birds_per_sack",
+   "fieldtype": "Int",
+   "label": "Birds per Sack"
+  },
+  {
+   "fieldname": "birds_per_sack_dropdown",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "No of bird per sack"
+  },
+  {
+   "fieldname": "no_of_sacks",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "No of Sacks"
+  },
+  {
+   "fieldname": "total_packed_birds",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Total Packed",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "modified": "2026-04-21 14:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Havano Abattoir",
+ "name": "Packing Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

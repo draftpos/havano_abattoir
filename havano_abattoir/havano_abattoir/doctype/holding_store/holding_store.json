@@ -1,0 +1,257 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "HAV-HST-.YYYY.-.####",
+ "creation": "2026-04-21 14:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "holding_status",
+  "section_custom_layout",
+  "custom_holding_layout",
+  "date",
+  "column_break_bmhd",
+  "time",
+  "column_break_vdwg",
+  "sheet_no",
+  "column_break_llvf",
+  "customer_name",
+  "column_break_ylyk",
+  "product",
+  "linked_packaging",
+  "section_break_inventory",
+  "packing_items",
+  "section_break_totals",
+  "total_sacks",
+  "col_break_t1",
+  "total_packed_birds",
+  "col_break_t2",
+  "total_kgs",
+  "section_break_personnel",
+  "customer_rep",
+  "col_break_t4",
+  "foreperson",
+  "col_break_t5",
+  "security",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_custom_layout",
+   "fieldtype": "Section Break",
+   "hide_border": 1
+  },
+  {
+   "fieldname": "custom_holding_layout",
+   "fieldtype": "HTML",
+   "label": "Custom Layout"
+  },
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "read_only": 1
+  },
+  {
+   "default": "now",
+   "fieldname": "time",
+   "fieldtype": "Time",
+   "label": "Time",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sheet_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Sheet No",
+   "read_only": 1
+  },
+  {
+   "fieldname": "customer_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Customer Name",
+   "options": "Customer",
+   "read_only": 1
+  },
+  {
+   "fieldname": "product",
+   "fieldtype": "Data",
+   "label": "Product",
+   "read_only": 1
+  },
+  {
+   "fieldname": "linked_packaging",
+   "fieldtype": "Link",
+   "label": "Linked Packaging",
+   "options": "Packaging",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_inventory",
+   "fieldtype": "Section Break",
+   "label": "Packed Inventory"
+  },
+  {
+   "fieldname": "packing_items",
+   "fieldtype": "Table",
+   "label": "Inventory Details",
+   "options": "Packing Item",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_totals",
+   "fieldtype": "Section Break",
+   "label": "Final Totals"
+  },
+  {
+   "fieldname": "total_sacks",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Total Sacks",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_t1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_packed_birds",
+   "fieldtype": "Int",
+   "label": "Total Packed Birds",
+   "read_only": 1
+  },
+  {
+   "fieldname": "col_break_t2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_kgs",
+   "fieldtype": "Float",
+   "label": "Total KG",
+   "precision": "3",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_personnel",
+   "fieldtype": "Section Break",
+   "label": "Staff & Personnel"
+  },
+  {
+   "fieldname": "customer_rep",
+   "fieldtype": "Link",
+   "label": "Customer Rep",
+   "options": "User",
+   "read_only": 1,
+   "show_title_field_in_link": 1
+  },
+  {
+   "fieldname": "col_break_t4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "foreperson",
+   "fieldtype": "Link",
+   "label": "Foreperson",
+   "options": "User",
+   "read_only": 1,
+   "show_title_field_in_link": 1
+  },
+  {
+   "fieldname": "col_break_t5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "security",
+   "fieldtype": "Link",
+   "label": "Security",
+   "options": "User",
+   "read_only": 1,
+   "show_title_field_in_link": 1
+  },
+  {
+   "default": "On Hand",
+   "fieldname": "holding_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Holding Status",
+   "options": "On Hand\nReady for Dispatch\nDispatched",
+   "reqd": 1,
+   "bold": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Holding Store",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_bmhd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_vdwg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_llvf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ylyk",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-04-21 15:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Havano Abattoir",
+ "name": "Holding Store",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "search_fields": "sheet_no,customer_name,foreperson,date,holding_status",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "sheet_no"
+}

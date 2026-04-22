@@ -1,0 +1,44 @@
+{
+ "actions": [],
+ "creation": "2026-04-21 12:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "offal_type",
+  "column_break_1",
+  "weight_kgs"
+ ],
+ "fields": [
+  {
+   "fieldname": "offal_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Offal Type",
+   "options": "Heads\nFeet\nGiz\nNeck\nLiver\nHeart\nCrop\nCasings",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "weight_kgs",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Weight (Kgs)",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "modified": "2026-04-21 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Havano Abattoir",
+ "name": "Offal Return",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

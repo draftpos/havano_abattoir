@@ -1,0 +1,87 @@
+<div class="print-heading">
+    <h2>Brining Weight Gain Report</h2>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+        <span><strong>Sheet No:</strong> {{ doc.sheet_no }}</span>
+        <span><strong>Customer:</strong> {{ doc.customer_name }}</span>
+        <span><strong>Date:</strong> {{ doc.get_formatted("date") }}</span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <table class="table table-bordered">
+            <thead>
+                <tr style="background-color: #f8fafc;">
+                    <th style="width: 70%;">Description</th>
+                    <th class="text-right">Weight (KG)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Fresh Weight (Before Brining)</td>
+                    <td class="text-right">{{ doc.get_formatted("fresh_weight") }}</td>
+                </tr>
+                <tr>
+                    <td>Brined Weight (After Brining)</td>
+                    <td class="text-right">{{ doc.get_formatted("total_kgs") }}</td>
+                </tr>
+                <tr style="font-weight: bold; font-size: 1.1em; background-color: #f1f5f9;">
+                    <td>TOTAL WEIGHT GAIN</td>
+                    <td class="text-right">{{ doc.get_formatted("brining_kg_difference") }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<h3 style="margin-top: 30px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Weight Distribution Summary</h3>
+<table class="table table-bordered table-condensed">
+    <thead>
+        <tr style="background-color: #f8fafc;">
+            <th>Weight Group / Label</th>
+            <th class="text-right">Total Units</th>
+            <th class="text-right">Total Weight (KG)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% set tables = [
+            ('Group 1', doc.weight_label_1, doc.processing_items_1),
+            ('Group 2', doc.weight_label_2, doc.processing_items_2),
+            ('Group 3', doc.weight_label_3, doc.processing_items_3),
+            ('Group 4', doc.weight_label_4, doc.processing_items_4),
+            ('Group 5', doc.weight_label_7, doc.processing_items_7),
+            ('Group 6', doc.weight_label_8, doc.processing_items_8),
+            ('Group 7', doc.weight_group_7_label, doc.weight_group_7),
+            ('Group 8', doc.weight_group_5_label_copy, doc.weight_group_5_copy)
+        ] %}
+        {% for label_name, label_val, items in tables %}
+            {% set sub_u = 0 %}
+            {% set sub_k = 0 %}
+            {% if items %}
+                {% for row in items %}
+                    {% set sub_u = sub_u + (row.units | int) %}
+                    {% set sub_k = sub_k + (row.kg | float) %}
+                {% endfor %}
+            {% endif %}
+            {% if sub_u > 0 or sub_k > 0 %}
+            <tr>
+                <td>{{ label_name }} ({{ label_val or 'Standard' }})</td>
+                <td class="text-right">{{ sub_u }}</td>
+                <td class="text-right">{{ sub_k | round(3) }}</td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr style="font-weight: bold; background-color: #f8fafc;">
+            <td>TOTALS</td>
+            <td class="text-right">{{ doc.total_units }}</td>
+            <td class="text-right">{{ doc.total_kgs | round(3) }}</td>
+        </tr>
+    </tfoot>
+</table>
+
+<div style="margin-top: 50px; display: flex; justify-content: space-between;">
+    <div style="border-top: 1px solid #000; width: 200px; text-align: center; padding-top: 5px;">Production Manager</div>
+    <div style="border-top: 1px solid #000; width: 200px; text-align: center; padding-top: 5px;">Quality Control</div>
+</div>

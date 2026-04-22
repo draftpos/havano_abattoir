@@ -1,8 +1,8 @@
-frappe.ui.form.on('Storage', {
+frappe.ui.form.on('Blast Freezer', {
     refresh: function (frm) {
         if (frm.custom_ui_doc !== frm.doc.name) {
             frm.custom_ui_doc = frm.doc.name;
-            $(frm.wrapper).find('#storage-custom-root').remove();
+            $(frm.wrapper).find('#blast_freezer-custom-root').remove();
             frm.custom_ui_rendered = false;
             setTimeout(() => { render_custom_form(frm); }, 150);
         }
@@ -14,23 +14,59 @@ frappe.ui.form.on('Storage', {
         });
 
         // Add indicator for status
-        let color = frm.doc.storage_status === 'Dispatched' ? 'green' : 'orange';
-        frm.page.set_indicator(frm.doc.storage_status, color);
+        let color = frm.doc.blast_freezer_status === 'Ready for Packing' ? 'green' : 'blue';
+        frm.page.set_indicator(frm.doc.blast_freezer_status, color);
 
-        // Explicitly disable submit button if status is 'On Hand'
-        if (frm.doc.docstatus === 0 && frm.doc.storage_status === 'On Hand') {
-            frm.page.set_primary_action(__('Save Status'), () => frm.save());
+        // Manage primary button based on status
+        if (frm.doc.docstatus === 0) {
+            if (frm.doc.blast_freezer_status === 'Ready for Packing') {
+                frm.page.set_primary_action(__('Submit to Packing'), () => {
+                    frm.save('Submit');
+                });
+            } else {
+                frm.page.set_primary_action(__('Save Status'), () => frm.save());
+            }
         }
 
-        // Ensure origin baselines (names/metrics) are updated if necessary
+        // Ensure origin baselines are updated if necessary
         if (!frm.is_new() && (frm.doc.linked_processing || frm.doc.linked_brining)) {
             set_origin_baselines(frm);
         }
+
+        // Filter: Only show submitted Processing/Brining records
+        ['linked_processing', 'linked_brining'].forEach(f => {
+            frm.set_query(f, () => {
+                return {
+                    filters: [
+                        [f.replace('linked_', '').charAt(0).toUpperCase() + f.replace('linked_', '').slice(1), 'docstatus', '=', 1]
+                    ]
+                };
+            });
+        });
     },
 
-    storage_status: function(frm) {
-        let color = frm.doc.storage_status === 'Dispatched' ? 'green' : 'orange';
-        frm.page.set_indicator(frm.doc.storage_status, color);
+    on_submit: function(frm) {
+        frappe.msgprint({
+            title: __('Success'),
+            indicator: 'green',
+            message: __('Blast Freezer record submitted. Data has been moved to the <b>Packaging / Holding Store</b> stage.')
+        });
+    },
+
+    blast_freezer_status: function(frm) {
+        let color = frm.doc.blast_freezer_status === 'Ready for Packing' ? 'green' : 'blue';
+        frm.page.set_indicator(frm.doc.blast_freezer_status, color);
+
+        // Update buttons dynamically when status changes
+        if (frm.doc.docstatus === 0) {
+            if (frm.doc.blast_freezer_status === 'Ready for Packing') {
+                frm.page.set_primary_action(__('Submit to Packing'), () => {
+                    frm.save('Submit');
+                });
+            } else {
+                frm.page.set_primary_action(__('Save Status'), () => frm.save());
+            }
+        }
     },
 
     linked_processing: function(frm) {
@@ -53,7 +89,7 @@ function set_origin_baselines(frm, auto_fill = false) {
     if (!source_name) return;
 
     frappe.db.get_doc(source_doctype, source_name).then(src => {
-        // Sync Customer and Personnel (IDs will be auto-resolved to Names by "Native Fetching")
+        // Sync Customer and Personnel
         if (!frm.doc.customer_name || auto_fill) {
             frm.set_value('customer_name', src.customer_name);
         }
@@ -64,21 +100,40 @@ function set_origin_baselines(frm, auto_fill = false) {
             }
         });
 
-        // Sync Offal counts and Variances
-        let fields = [
-            'heads', 'feet', 'giz', 'neck', 'liver', 'heart', 'crop', 'casings',
-            'variance_heads', 'variance_feet', 'variance_giz', 'variance_neck', 
-            'variance_liver', 'variance_heart', 'variance_crop', 'variance_casings'
-        ];
+        // Sync Offal counts
+        let fields = ['heads', 'feet', 'giz', 'neck', 'liver', 'heart', 'crop', 'casings'];
         
-        fields.forEach(f => {
-            if (src[f] !== undefined && (frm.doc[f] === 0 || frm.doc[f] === null || auto_fill)) {
-                frm.set_value(f, src[f]);
-            }
-        });
+        // Note: These fields were removed from JSON but the source might still have them 
+        // as data, though the user removed them from the form.
+        // We focus on the Offal Returns table now.
+        
+        setup_offal_returns(frm);
+        if (src.offal_returns) {
+            frm.clear_table('offal_returns');
+            src.offal_returns.forEach(row => {
+                let r = frm.add_child('offal_returns');
+                r.offal_type = row.offal_type;
+                r.weight_kgs = row.weight_kgs;
+            });
+            frm.refresh_field('offal_returns');
+        }
 
-        if (auto_fill) frm.refresh_fields(fields);
+        if (auto_fill) frm.refresh_fields(['customer_name', 'customer_rep', 'foreperson', 'security']);
     });
+}
+
+function setup_offal_returns(frm) {
+    const types = ['Heads', 'Feet', 'Giz', 'Neck', 'Liver', 'Heart', 'Crop', 'Casings'];
+    const current_types = (frm.doc.offal_returns || []).map(row => row.offal_type);
+    
+    types.forEach(t => {
+        if (!current_types.includes(t)) {
+            let row = frm.add_child('offal_returns');
+            row.offal_type = t;
+            row.weight_kgs = 0.0;
+        }
+    });
+    frm.refresh_field('offal_returns');
 }
 
 function render_custom_form(frm) {
@@ -87,13 +142,13 @@ function render_custom_form(frm) {
 
     let html = `
     <style>
-        #storage-custom-root {
+        #blast-freezer-custom-root {
             padding: 16px 20px 40px;
             background: #f1f5f9;
             box-sizing: border-box;
         }
-        #storage-custom-root .frappe-control[data-fieldtype="Column Break"],
-        #storage-custom-root .frappe-control[data-fieldtype="Section Break"] { display: none !important; }
+        #blast-freezer-custom-root .frappe-control[data-fieldtype="Column Break"],
+        #blast-freezer-custom-root .frappe-control[data-fieldtype="Section Break"] { display: none !important; }
 
         .dc-card {
             background: #fff;
@@ -112,26 +167,8 @@ function render_custom_form(frm) {
             justify-content: space-between;
             align-items: center;
         }
-        .dc-head.collapsible { cursor: pointer; }
-        .dc-head.collapsible:hover { background: #f1f5f9; }
         .dc-title { font-size: 14px; font-weight: 600; color: #1e293b; margin: 0; display: flex; align-items: center; gap: 8px; }
         .dc-body { padding: 16px 20px; }
-        .chevron { transition: transform 0.25s; fill: #64748b; flex-shrink: 0; }
-        .is-collapsed .chevron { transform: rotate(-90deg); }
-
-        /* Compact Table Layout */
-        .wg-box .grid-heading-row .row, .wg-box .data-row.row {
-            display: flex !important; align-items: center !important; flex-wrap: nowrap !important;
-        }
-        .wg-box .grid-heading-row .row > [class*="col-"], .wg-box .data-row.row > [class*="col-"] {
-            flex: 1 1 0 !important; width: auto !important; min-width: 0 !important; float: none !important;
-        }
-        /* Shrink Checkbox Column to give more space to KG */
-        .wg-box .grid-heading-row .row > :first-child, 
-        .wg-box .data-row.row > :first-child {
-            flex: 0 0 32px !important;
-            max-width: 32px !important;
-        }
 
         .wg-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
         @media (max-width: 992px) { .wg-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -153,18 +190,35 @@ function render_custom_form(frm) {
             padding-bottom: 8px;
             border-bottom: 1px dashed #cbd5e1;
         }
-        .wg-box .frappe-control label.control-label { font-size: 11px !important; color: #64748b !important; }
+
+        /* Compact Table Layout to prevent overlapping */
+        .wg-box .grid-heading-row .row, .wg-box .data-row.row {
+            display: flex !important; align-items: center !important; flex-wrap: nowrap !important;
+        }
+        .wg-box .grid-heading-row .row > [class*="col-"], .wg-box .data-row.row > [class*="col-"] {
+            flex: 1 1 0 !important; width: auto !important; min-width: 0 !important; float: none !important;
+        }
+        .wg-box .grid-heading-row .row > :first-child, 
+        .wg-box .data-row.row > :first-child {
+            flex: 0 0 35px !important;
+            max-width: 35px !important;
+        }
+
+        .dc-head.collapsible { cursor: pointer; }
+        .dc-head.collapsible:hover { background: #f1f5f9; }
+        .chevron { transition: transform 0.2s; }
+        .is-collapsed .chevron { transform: rotate(-90deg); }
     </style>
 
-    <div class="dc-card" style="border-left: 5px solid #0891b2;">
-        <div class="dc-head"><div class="dc-title">🔘 Batch Status</div></div>
+    <div class="dc-card" style="border-left: 5px solid #3b82f6;">
+        <div class="dc-head"><div class="dc-title">❄️ Blast Freezer Status</div></div>
         <div class="dc-body">
-            <div id="ph-storage_status"></div>
+            <div id="ph-blast_freezer_status"></div>
         </div>
     </div>
 
     <div class="dc-card">
-        <div class="dc-head"><div class="dc-title">❄️ Storage Information</div></div>
+        <div class="dc-head"><div class="dc-title">📋 Information</div></div>
         <div class="dc-body">
             <div class="row">
                 <div class="col-xs-12 col-sm-6 col-md-3" id="ph-date"></div>
@@ -192,7 +246,7 @@ function render_custom_form(frm) {
 
     <div class="dc-card is-collapsed" id="extra-card">
         <div class="dc-head collapsible" onclick="toggle_extra()">
-            <div class="dc-title">📦 Additional Inventory Batches (5 – 8)</div>
+            <div class="dc-title">📦 Additional Batches (5 – 8)</div>
             <svg class="chevron" width="18" height="18" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
         </div>
         <div class="dc-body" id="extra-card-body" style="display:none;">
@@ -206,29 +260,14 @@ function render_custom_form(frm) {
     </div>
 
     <div class="dc-card">
-        <div class="dc-head"><div class="dc-title">🥩 Offals & Variances (from Origin)</div></div>
+        <div class="dc-head"><div class="dc-title">🥩 Offal Returns</div></div>
         <div class="dc-body">
-            <div class="row">
-                <div class="col-xs-6 col-md-3" id="ph-heads"></div><div class="col-xs-6 col-md-3" id="ph-variance_heads"></div>
-                <div class="col-xs-6 col-md-3" id="ph-feet"></div><div class="col-xs-6 col-md-3" id="ph-variance_feet"></div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-xs-6 col-md-3" id="ph-giz"></div><div class="col-xs-6 col-md-3" id="ph-variance_giz"></div>
-                <div class="col-xs-6 col-md-3" id="ph-neck"></div><div class="col-xs-6 col-md-3" id="ph-variance_neck"></div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-xs-6 col-md-3" id="ph-liver"></div><div class="col-xs-6 col-md-3" id="ph-variance_liver"></div>
-                <div class="col-xs-6 col-md-3" id="ph-heart"></div><div class="col-xs-6 col-md-3" id="ph-variance_heart"></div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-xs-6 col-md-3" id="ph-crop"></div><div class="col-xs-6 col-md-3" id="ph-variance_crop"></div>
-                <div class="col-xs-6 col-md-3" id="ph-casings"></div><div class="col-xs-6 col-md-3" id="ph-variance_casings"></div>
-            </div>
+            <div id="ph-offal_returns"></div>
         </div>
     </div>
 
     <div class="dc-card">
-        <div class="dc-head"><div class="dc-title">📊 Final Totals & Staff</div></div>
+        <div class="dc-head"><div class="dc-title">📊 Totals & Staff</div></div>
         <div class="dc-body">
             <div class="row" style="padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid #e2e8f0;">
                 <div class="col-xs-6 col-md-3" id="ph-total_bags"></div><div class="col-xs-6 col-md-3" id="ph-total_units"></div>
@@ -242,7 +281,7 @@ function render_custom_form(frm) {
         </div>
     </div>`;
 
-    let $root = $('<div id="storage-custom-root">').html(html);
+    let $root = $('<div id="blast_freezer-custom-root">').html(html);
     let $page_head = $(frm.wrapper).find('.page-head');
     if ($page_head.length) { $root.insertAfter($page_head); } else { $(frm.wrapper).prepend($root); }
 
@@ -252,16 +291,15 @@ function render_custom_form(frm) {
     };
 
     let move_fields = [
-        'date','time','sheet_no','customer_name','product','storage_status',
+        'date','time','sheet_no','customer_name','product','blast_freezer_status',
         'linked_processing','linked_brining',
-        'heads','feet','giz','neck','liver','heart','crop','casings',
-        'variance_heads','variance_feet','variance_giz','variance_neck','variance_liver','variance_heart','variance_crop','variance_casings',
+        'offal_returns',
         'total_bags','total_units','units_per_kg','total_kgs',
         'customer_rep','foreperson','security',
         'weight_label_1','processing_items_1','weight_label_2','processing_items_2',
         'weight_label_3','processing_items_3','weight_label_4','processing_items_4',
-        'weight_label_7','processing_items_7','weight_label_8','processing_items_8',
-        'weight_group_7_label','weight_group_7','weight_group_5_label_copy','weight_group_5_copy'
+        'weight_label_7', 'processing_items_7', 'weight_label_8', 'processing_items_8',
+        'weight_group_7_label', 'weight_group_7', 'weight_group_5_label_copy', 'weight_group_5_copy'
     ];
 
     move_fields.forEach(fname => {

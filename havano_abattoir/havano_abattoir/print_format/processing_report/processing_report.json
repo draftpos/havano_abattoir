@@ -1,0 +1,14 @@
+{
+ "creation": "2026-04-22 11:15:00.000000",
+ "doc_type": "Processing",
+ "doctype": "Print Format",
+ "format": "HTML",
+ "html": "<div class=\"print-heading\">\n    <h2 style=\"text-align: center; margin-bottom: 30px; color: #1e293b;\">Processing Report</h2>\n    <div style=\"display: flex; justify-content: space-between; margin-bottom: 25px; padding: 15px; background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;\">\n        <div>\n            <div style=\"margin-bottom: 5px;\"><strong>Sheet No:</strong> {{ doc.sheet_no }}</div>\n            <div><strong>Customer:</strong> {{ doc.customer_name }}</div>\n        </div>\n        <div style=\"text-align: right;\">\n            <div style=\"margin-bottom: 5px;\"><strong>Date:</strong> {{ doc.get_formatted(\"date\") }}</div>\n            <div><strong>Product:</strong> {{ doc.product }}</div>\n        </div>\n    </div>\n</div>\n\n<h3 style=\"font-size: 14px; text-transform: uppercase; margin-bottom: 10px; color: #475569;\">Processing Totals</h3>\n<table class=\"table table-bordered\">\n    <thead>\n        <tr style=\"background-color: #f1f5f9;\">\n            <th>Description</th>\n            <th class=\"text-right\">Units</th>\n            <th class=\"text-right\">Weight (KG)</th>\n        </tr>\n    </thead>\n    <tbody>\n        <tr style=\"font-weight: bold;\">\n            <td>TOTAL PROCESSED</td>\n            <td class=\"text-right\">{{ doc.total_units }}</td>\n            <td class=\"text-right\">{{ doc.total_kgs | round(3) }}</td>\n        </tr>\n    </tbody>\n</table>\n\n<div style=\"margin-top: 60px;\">\n    <div style=\"display: flex; justify-content: space-between; gap: 30px;\">\n        <div style=\"flex: 1; text-align: center;\">\n            <div style=\"border-bottom: 1px solid #000; height: 30px;\"></div>\n            <div style=\"margin-top: 8px; font-weight: bold;\">Customer Representative</div>\n            <div style=\"font-size: 11px; color: #64748b;\">{{ doc.customer_rep or \"\" }}</div>\n        </div>\n        <div style=\"flex: 1; text-align: center;\">\n            <div style=\"border-bottom: 1px solid #000; height: 30px;\"></div>\n            <div style=\"margin-top: 8px; font-weight: bold;\">Foreperson</div>\n            <div style=\"font-size: 11px; color: #64748b;\">{{ doc.foreperson or \"\" }}</div>\n        </div>\n        <div style=\"flex: 1; text-align: center;\">\n            <div style=\"border-bottom: 1px solid #000; height: 30px;\"></div>\n            <div style=\"margin-top: 8px; font-weight: bold;\">Security Personnel</div>\n            <div style=\"font-size: 11px; color: #64748b;\">{{ doc.security or \"\" }}</div>\n        </div>\n    </div>\n</div>",
+ "modified": "2026-04-22 11:15:00.000000",
+ "modified_by": "Administrator",
+ "module": "Havano Abattoir",
+ "name": "Processing Report",
+ "owner": "Administrator",
+ "print_format_type": "Jinja",
+ "standard": "Yes"
+}

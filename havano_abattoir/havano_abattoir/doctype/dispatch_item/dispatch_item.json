@@ -1,0 +1,54 @@
+{
+ "actions": [],
+ "creation": "2026-04-21 15:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "classification",
+  "birds_per_sack",
+  "no_of_sacks",
+  "total_packed_birds"
+ ],
+ "fields": [
+  {
+   "fieldname": "classification",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Classification",
+   "read_only": 1
+  },
+  {
+   "fieldname": "birds_per_sack",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Birds per Sack",
+   "read_only": 1
+  },
+  {
+   "fieldname": "no_of_sacks",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "No of Sacks",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_packed_birds",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Total Packed Birds",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "modified": "2026-04-21 15:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Havano Abattoir",
+ "name": "Dispatch Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

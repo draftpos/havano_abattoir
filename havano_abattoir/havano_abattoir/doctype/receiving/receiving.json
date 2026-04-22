@@ -8,6 +8,7 @@
  "engine": "InnoDB",
  "field_order": [
   "date",
+  "birds_per_crate",
   "column_break_xptv",
   "time",
   "column_break_yght",
@@ -18,6 +19,8 @@
   "ambient_temperature",
   "section_break_items",
   "receiving_items",
+  "section_break_dead_birds",
+  "dead_birds",
   "section_break_summary",
   "total_live_birds",
   "col_break_1",
@@ -33,7 +36,6 @@
   "foreperson",
   "col_break_4",
   "security",
-  "column_break_ejdq",
   "amended_from"
  ],
  "fields": [
@@ -74,6 +76,11 @@
    "label": "Ambient Temperature"
   },
   {
+   "fieldname": "birds_per_crate",
+   "fieldtype": "Int",
+   "label": "Birds Loaded Per Crate"
+  },
+  {
    "fieldname": "section_break_items",
    "fieldtype": "Section Break",
    "label": "Receiving Items"
@@ -83,6 +90,17 @@
    "fieldtype": "Table",
    "label": "Receiving Items",
    "options": "Receiving Item"
+  },
+  {
+   "fieldname": "section_break_dead_birds",
+   "fieldtype": "Section Break",
+   "label": "Dead Birds (DOA / DIP)"
+  },
+  {
+   "fieldname": "dead_birds",
+   "fieldtype": "Table",
+   "label": "Dead Birds",
+   "options": "Dead Bird Entry"
   },
   {
    "fieldname": "section_break_summary",
@@ -122,8 +140,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "allow_on_submit": 1,
-   "default": "Open",
    "fieldname": "processing_status",
    "fieldtype": "Select",
    "label": "Processing Status",
@@ -209,7 +225,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-04-10 12:54:18.814960",
+ "modified": "2026-04-21 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Havano Abattoir",
  "name": "Receiving",

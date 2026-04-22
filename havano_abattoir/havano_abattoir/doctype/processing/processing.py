@@ -19,14 +19,11 @@ class Processing(Document):
                     frappe.throw(frappe._("Total KG (<b>{0}</b>) cannot exceed Weight in Linked Receiving (<b>{1} kg</b>)").format(
                         self.total_kgs, receiving_data.total_kgs))
 
-    def before_save(self):
-        self.calculate_variance()
-
     def on_submit(self):
         self.update_receiving_status(is_submit=True)
-        # Push to Storage if user selected Unbrining
+        # Push to Blast Freezer if user selected Unbrining
         if self.workflow_next_step == "Unbrining (Send to Storage)":
-            push_to_storage(self, "linked_processing")
+            push_to_blast_freezer(self, "linked_processing")
 
     def on_cancel(self):
         self.update_receiving_status(is_submit=False)
@@ -74,26 +71,9 @@ class Processing(Document):
         self.total_kgs = total_kgs
         self.units_per_kg = round(total_units / total_kgs, 3) if total_kgs > 0 else 0
 
-    def calculate_variance(self):
-        # Variance = Actual returns minus Expected Baseline (from Receiving)
-        if not self.linked_receiving:
-             return
-
-        expected_birds = frappe.db.get_value("Receiving", self.linked_receiving, "total_live_birds") or 0
-        
-        # Variance = Expected - Actual (remaining to be found)
-        self.variance_heads   = expected_birds - int(self.heads or 0)
-        self.variance_feet    = (expected_birds * 2) - int(self.feet or 0)
-        self.variance_giz     = expected_birds - int(self.giz or 0)
-        self.variance_neck    = expected_birds - int(self.neck or 0)
-        self.variance_liver   = expected_birds - int(self.liver or 0)
-        self.variance_heart   = expected_birds - int(self.heart or 0)
-        self.variance_crop    = expected_birds - int(self.crop or 0)
-        self.variance_casings = expected_birds - int(self.casings or 0)
-
-def push_to_storage(doc, link_field):
-    storage = frappe.new_doc("Storage")
-    storage.update({
+def push_to_blast_freezer(doc, link_field):
+    bf = frappe.new_doc("Blast Freezer")
+    bf.update({
         "customer_name": doc.customer_name,
         "product": doc.product,
         "sheet_no": doc.sheet_no,
@@ -105,15 +85,16 @@ def push_to_storage(doc, link_field):
         "total_kgs": doc.total_kgs,
         "units_per_kg": doc.units_per_kg,
         link_field: doc.name,
-        "storage_status": "On Hand"
+        "blast_freezer_status": "Freezing"
     })
     
-    # Copy Offals and Variances
-    offal_fields = ['heads', 'feet', 'giz', 'neck', 'liver', 'heart', 'crop', 'casings']
-    variance_fields = ['variance_heads', 'variance_feet', 'variance_giz', 'variance_neck', 'variance_liver', 'variance_heart', 'variance_crop', 'variance_casings']
-    
-    for f in offal_fields + variance_fields:
-        storage.set(f, doc.get(f))
+    # Copy Offal Returns table
+    bf.set("offal_returns", [])
+    for row in (doc.get("offal_returns") or []):
+        bf.append("offal_returns", {
+            "offal_type": row.offal_type,
+            "weight_kgs": row.weight_kgs
+        })
     
     tables = [
         'processing_items_1', 'processing_items_2', 'processing_items_3', 'processing_items_4',
@@ -121,15 +102,15 @@ def push_to_storage(doc, link_field):
     ]
     
     for label_f in ['weight_label_1', 'weight_label_2', 'weight_label_3', 'weight_label_4', 'weight_label_7', 'weight_label_8', 'weight_group_7_label', 'weight_group_5_label_copy']:
-        storage.set(label_f, doc.get(label_f))
+        bf.set(label_f, doc.get(label_f))
 
     for tbl in tables:
-        storage.set(tbl, [])
+        bf.set(tbl, [])
         for row in (doc.get(tbl) or []):
-            storage.append(tbl, {
+            bf.append(tbl, {
                 "units": row.units,
                 "kg": row.kg
             })
     
-    storage.insert(ignore_permissions=True)
-    frappe.msgprint(frappe._("Finalized batch has been posted to <b>Storage</b> (On Hand)."))
+    bf.insert(ignore_permissions=True)
+    frappe.msgprint(frappe._("Batch has been posted to <b>Blast Freezer</b> (Freezing)."))

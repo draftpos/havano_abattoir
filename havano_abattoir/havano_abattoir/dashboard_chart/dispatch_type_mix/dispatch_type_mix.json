@@ -4,7 +4,7 @@
  "creation": "2026-04-11 08:35:00.000000",
  "docstatus": 0,
  "doctype": "Dashboard Chart",
- "document_type": "Processing",
+ "document_type": "Dispatch",
  "filters_json": "[]",
  "group_by_based_on": "customer_name",
  "group_by_type": "Count",
@@ -16,5 +16,6 @@
  "module": "Havano Abattoir",
  "name": "Dispatch Type Mix",
  "owner": "Administrator",
+ "legend_position": "Right",
  "type": "Donut"
 }

@@ -28,6 +28,23 @@ frappe.ui.form.on('Brining', {
         if (frm.doc.linked_processing) {
             set_processing_baselines(frm);
         }
+
+        // Filter: Only show submitted Processing records
+        frm.set_query('linked_processing', function() {
+            return {
+                filters: [
+                    ['Processing', 'docstatus', '=', 1]
+                ]
+            };
+        });
+    },
+
+    on_submit: function(frm) {
+        frappe.msgprint({
+            title: __('Success'),
+            indicator: 'green',
+            message: __('Brining record submitted. Data has been moved to the <b>Blast Freezer</b> stage.')
+        });
     },
 
     linked_processing: function(frm) {
@@ -73,6 +90,9 @@ function set_processing_baselines(frm, auto_fill = false) {
             frm.set_value('foreperson', proc.foreperson);
             frm.set_value('security', proc.security);
 
+            // Fetch total KGs from processing as "Fresh Weight" (Weight before brining)
+            frm.set_value('fresh_weight', proc.total_kgs);
+
             // Copy weight labels
             let label_fields = ['weight_label_1', 'weight_label_2', 'weight_label_3', 'weight_label_4', 'weight_label_7', 'weight_label_8', 'weight_group_7_label', 'weight_group_5_label_copy'];
             label_fields.forEach(f => { frm.set_value(f, proc[f]); });
@@ -81,24 +101,48 @@ function set_processing_baselines(frm, auto_fill = false) {
             let tables = ['processing_items_1','processing_items_2','processing_items_3','processing_items_4','processing_items_7','processing_items_8','weight_group_7','weight_group_5_copy'];
             tables.forEach(table_name => {
                 frm.clear_table(table_name);
-                (proc[table_name] || []).forEach(row => {
-                    let r = frm.add_child(table_name);
-                    r.units = row.units;
-                    r.kg = row.kg;
-                });
+                if (proc[table_name]) {
+                    proc[table_name].forEach(item => {
+                        let row = frm.add_child(table_name);
+                        row.units = item.units;
+                        row.kg = item.kg; // Initial kg from processing, but brining expects manual update or difference tracking
+                    });
+                }
             });
 
-            // Copy Offal parts and Variances from Processing
-            let offal_fields = ['heads', 'feet', 'giz', 'neck', 'liver', 'heart', 'crop', 'casings'];
-            let variance_fields = ['variance_heads', 'variance_feet', 'variance_giz', 'variance_neck', 'variance_liver', 'variance_heart', 'variance_crop', 'variance_casings'];
-            
-            offal_fields.forEach(f => { frm.set_value(f, proc[f]); });
-            variance_fields.forEach(f => { frm.set_value(f, proc[f]); });
+            frm.refresh_fields();
+
+            // Copy Offal Returns table
+            frm.clear_table('offal_returns');
+            (proc.offal_returns || []).forEach(row => {
+                let r = frm.add_child('offal_returns');
+                r.offal_type = row.offal_type;
+                r.weight_kgs = row.weight_kgs;
+            });
 
             frm.refresh();
             calculate_totals(frm);
         });
+    } else {
+        if (!frm.doc.offal_returns || frm.doc.offal_returns.length === 0) {
+            setup_offal_returns(frm);
+        }
+        calculate_totals(frm);
     }
+}
+
+function setup_offal_returns(frm) {
+    const types = ['Heads', 'Feet', 'Giz', 'Neck', 'Liver', 'Heart', 'Crop', 'Casings'];
+    const current_types = (frm.doc.offal_returns || []).map(row => row.offal_type);
+    
+    types.forEach(t => {
+        if (!current_types.includes(t)) {
+            let row = frm.add_child('offal_returns');
+            row.offal_type = t;
+            row.weight_kgs = 0.0;
+        }
+    });
+    frm.refresh_field('offal_returns');
 }
 
 function calculate_totals(frm) {
@@ -135,6 +179,9 @@ function calculate_totals(frm) {
     frm.set_value('total_bags', total_bags);
     frm.set_value('total_kgs', total_kgs);
     frm.set_value('units_per_kg', total_kgs > 0 ? parseFloat((total_units / total_kgs).toFixed(3)) : 0);
+    
+    let fresh = frm.doc.fresh_weight || 0;
+    frm.set_value('brining_kg_difference', total_kgs - fresh);
 }
 
 function render_custom_form(frm) {
@@ -207,6 +254,24 @@ function render_custom_form(frm) {
             padding-bottom: 8px;
             border-bottom: 1px dashed #cbd5e1;
         }
+
+        .offal-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            background: #f8fafc;
+            height: 100%;
+        }
+        .offal-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
     </style>
 
     <div class="dc-card">
@@ -219,6 +284,7 @@ function render_custom_form(frm) {
                 <div class="col-xs-12 col-sm-6 col-md-3" id="ph-customer_name"></div>
                 <div class="col-xs-12 col-md-4 mt-3" id="ph-product"></div>
                 <div class="col-xs-12 col-md-4 mt-3" id="ph-linked_processing"></div>
+                <div class="col-xs-12 col-md-4 mt-3" id="ph-fresh_weight"></div>
             </div>
         </div>
     </div>
@@ -251,23 +317,25 @@ function render_custom_form(frm) {
     </div>
 
     <div class="dc-card">
-        <div class="dc-head"><div class="dc-title">🥩 Offals & Variances (from Processing)</div></div>
+        <div class="dc-head"><div class="dc-title">🥩 Brining Weight Analysis & Offals</div></div>
         <div class="dc-body">
             <div class="row">
-                <div class="col-xs-6 col-md-3" id="ph-heads"></div><div class="col-xs-6 col-md-3" id="ph-variance_heads"></div>
-                <div class="col-xs-6 col-md-3" id="ph-feet"></div><div class="col-xs-6 col-md-3" id="ph-variance_feet"></div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-xs-6 col-md-3" id="ph-giz"></div><div class="col-xs-6 col-md-3" id="ph-variance_giz"></div>
-                <div class="col-xs-6 col-md-3" id="ph-neck"></div><div class="col-xs-6 col-md-3" id="ph-variance_neck"></div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-xs-6 col-md-3" id="ph-liver"></div><div class="col-xs-6 col-md-3" id="ph-variance_liver"></div>
-                <div class="col-xs-6 col-md-3" id="ph-heart"></div><div class="col-xs-6 col-md-3" id="ph-variance_heart"></div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-xs-6 col-md-3" id="ph-crop"></div><div class="col-xs-6 col-md-3" id="ph-variance_crop"></div>
-                <div class="col-xs-6 col-md-3" id="ph-casings"></div><div class="col-xs-6 col-md-3" id="ph-variance_casings"></div>
+                <div class="col-md-5">
+                    <div class="offal-card" style="background:#fff7ed; border-color:#fed7aa;">
+                        <div class="offal-title" style="color:#9a3412;">⚖️ Brining KG Difference</div>
+                        <div style="padding: 10px 0;">
+                            <div id="ph-fresh_weight"></div>
+                            <div id="ph-total_kgs"></div>
+                            <div id="ph-brining_kg_difference" style="margin-top:10px; padding-top:10px; border-top:1px dashed #fdba74;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="offal-card" style="background:#fff;border-color:#e2e8f0;">
+                        <div class="offal-title">🥩 Actual Returns (KGs)</div>
+                        <div id="ph-offal_returns"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -277,7 +345,7 @@ function render_custom_form(frm) {
         <div class="dc-body">
             <div class="row" style="padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid #e2e8f0;">
                 <div class="col-xs-6 col-md-3" id="ph-total_bags"></div><div class="col-xs-6 col-md-3" id="ph-total_units"></div>
-                <div class="col-xs-6 col-md-3" id="ph-units_per_kg"></div><div class="col-xs-6 col-md-3" id="ph-brining_kg_difference"></div>
+                <div class="col-xs-6 col-md-3" id="ph-units_per_kg"></div><div class="col-xs-6 col-md-3" id="ph-total_kgs_v2" style="display:none;"></div>
             </div>
             <div class="row">
                 <div class="col-md-4"><div id="ph-customer_rep"></div></div>
@@ -298,9 +366,9 @@ function render_custom_form(frm) {
 
     let move_fields = [
         'date','time','sheet_no','customer_name','product','linked_processing',
-        'heads','feet','giz','neck','liver','heart','crop','casings',
-        'variance_heads','variance_feet','variance_giz','variance_neck','variance_liver','variance_heart','variance_crop','variance_casings',
-        'total_bags','total_units','units_per_kg','brining_kg_difference',
+        'fresh_weight','total_kgs','brining_kg_difference',
+        'offal_returns',
+        'total_bags','total_units','units_per_kg',
         'customer_rep','foreperson','security',
         'weight_label_1','processing_items_1','weight_label_2','processing_items_2',
         'weight_label_3','processing_items_3','weight_label_4','processing_items_4',

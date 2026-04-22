@@ -59,39 +59,11 @@
   "col_break_t5",
   "security",
   "section_break_offal",
-  "heads",
-  "col_break_o1",
-  "feet",
-  "col_break_o2",
-  "giz",
-  "col_break_o3",
-  "neck",
-  "col_break_o4",
-  "liver",
-  "col_break_o5",
-  "heart",
-  "col_break_o6",
-  "crop",
-  "col_break_o7",
-  "casings",
-  "section_break_variance",
-  "variance_heads",
-  "col_break_v1",
-  "variance_feet",
-  "col_break_v2",
-  "variance_giz",
-  "col_break_v3",
-  "variance_neck",
-  "col_break_v4",
-  "variance_liver",
-  "col_break_v5",
-  "variance_heart",
-  "col_break_v6",
-  "variance_crop",
-  "col_break_v7",
-  "variance_casings",
+  "section_break_offal_returns",
+  "offal_returns",
   "section_break_status",
   "column_break_zzel",
+  "fresh_weight",
   "brining_kg_difference",
   "column_break_acgy"
  ],
@@ -238,80 +210,30 @@
   {
    "fieldname": "section_break_offal",
    "fieldtype": "Section Break",
-   "label": "Offal / Parts"
+   "label": "Offal Returns"
   },
   {
-   "fieldname": "heads",
-   "fieldtype": "Int",
-   "label": "Heads"
+   "fieldname": "section_break_offal_returns",
+   "fieldtype": "Section Break",
+   "label": "Actual Returns of Offals (in KGs)"
   },
   {
-   "fieldname": "col_break_o1",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "feet",
-   "fieldtype": "Int",
-   "label": "Feet"
-  },
-  {
-   "fieldname": "col_break_o2",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "giz",
-   "fieldtype": "Int",
-   "label": "Giz"
-  },
-  {
-   "fieldname": "col_break_o3",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "neck",
-   "fieldtype": "Int",
-   "label": "Neck"
-  },
-  {
-   "fieldname": "col_break_o4",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "liver",
-   "fieldtype": "Int",
-   "label": "Liver"
-  },
-  {
-   "fieldname": "col_break_o5",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "heart",
-   "fieldtype": "Int",
-   "label": "Heart"
-  },
-  {
-   "fieldname": "col_break_o6",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "crop",
-   "fieldtype": "Int",
-   "label": "Crop"
-  },
-  {
-   "fieldname": "col_break_o7",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "casings",
-   "fieldtype": "Int",
-   "label": "Casings"
+   "fieldname": "offal_returns",
+   "fieldtype": "Table",
+   "label": "Offal Returns",
+   "options": "Offal Return"
   },
   {
    "fieldname": "section_break_status",
    "fieldtype": "Section Break",
    "label": "Brining Information"
+  },
+  {
+   "fieldname": "fresh_weight",
+   "fieldtype": "Float",
+   "label": "Fresh Weight (Before Brining)",
+   "precision": "3",
+   "read_only": 1
   },
   {
    "fieldname": "brining_kg_difference",
@@ -473,94 +395,13 @@
    "fieldtype": "Table",
    "label": "Weight Group",
    "options": "Processing Item"
-  },
-  {
-   "fieldname": "section_break_variance",
-   "fieldtype": "Section Break",
-   "label": "Variances (from Processing)"
-  },
-  {
-   "fieldname": "variance_heads",
-   "fieldtype": "Int",
-   "label": "Heads Variance",
-   "read_only": 1
-  },
-  {
-   "fieldname": "col_break_v1",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "variance_feet",
-   "fieldtype": "Int",
-   "label": "Feet Variance",
-   "read_only": 1
-  },
-  {
-   "fieldname": "col_break_v2",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "variance_giz",
-   "fieldtype": "Int",
-   "label": "Giz Variance",
-   "read_only": 1
-  },
-  {
-   "fieldname": "col_break_v3",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "variance_neck",
-   "fieldtype": "Int",
-   "label": "Neck Variance",
-   "read_only": 1
-  },
-  {
-   "fieldname": "col_break_v4",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "variance_liver",
-   "fieldtype": "Int",
-   "label": "Liver Variance",
-   "read_only": 1
-  },
-  {
-   "fieldname": "col_break_v5",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "variance_heart",
-   "fieldtype": "Int",
-   "label": "Heart Variance",
-   "read_only": 1
-  },
-  {
-   "fieldname": "col_break_v6",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "variance_crop",
-   "fieldtype": "Int",
-   "label": "Crop Variance",
-   "read_only": 1
-  },
-  {
-   "fieldname": "col_break_v7",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "variance_casings",
-   "fieldtype": "Int",
-   "label": "Casings Variance",
-   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-04-16 13:31:42.651734",
+ "modified": "2026-04-21 16:00:00.000000",
  "modified_by": "Administrator",
  "module": "Havano Abattoir",
  "name": "Brining",

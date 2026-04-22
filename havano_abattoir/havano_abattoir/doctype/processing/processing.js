@@ -19,10 +19,11 @@ frappe.ui.form.on('Processing', {
             setTimeout(() => { render_custom_form(frm); }, 150);
         }
 
-        // Filter: Hide fully processed Receiving records
+        // Filter: Hide fully processed Receiving records and only show submitted ones
         frm.set_query('linked_receiving', function () {
             return {
                 filters: [
+                    ['Receiving', 'docstatus', '=', 1],
                     ['Receiving', 'processing_status', '!=', 'Fully Processed']
                 ]
             };
@@ -44,6 +45,12 @@ frappe.ui.form.on('Processing', {
         if (frm.brining_redirect) {
             create_brining_from_processing(frm);
         }
+
+        frappe.msgprint({
+            title: __('Success'),
+            indicator: 'green',
+            message: __('Processing record submitted. Data has been moved to the <b>' + (frm.doc.workflow_next_step || 'next') + '</b> stage.')
+        });
     },
 
     linked_receiving: function (frm) {
@@ -122,13 +129,7 @@ frappe.ui.form.on('Processing Item', {
     });
 });
 
-['heads', 'feet', 'giz', 'neck', 'liver', 'heart', 'crop', 'casings'].forEach(field => {
-    frappe.ui.form.on('Processing', {
-        [field]: function (frm) {
-            calculate_totals(frm);
-        }
-    });
-});
+
 
 function set_receiving_baselines(frm, auto_fill = false) {
     frappe.db.get_value('Receiving', frm.doc.linked_receiving, ['total_live_birds', 'total_kgs', 'average_live_weight'], (r) => {
@@ -147,12 +148,30 @@ function set_receiving_baselines(frm, auto_fill = false) {
                 frm.set_value('foreperson', rcv.foreperson);
                 frm.set_value('security', rcv.security);
 
+                setup_offal_returns(frm);
                 calculate_totals(frm);
             });
         } else {
+            if (!frm.doc.offal_returns || frm.doc.offal_returns.length === 0) {
+                setup_offal_returns(frm);
+            }
             calculate_totals(frm);
         }
     });
+}
+
+function setup_offal_returns(frm) {
+    const types = ['Heads', 'Feet', 'Giz', 'Neck', 'Liver', 'Heart', 'Crop', 'Casings'];
+    const current_types = (frm.doc.offal_returns || []).map(row => row.offal_type);
+    
+    types.forEach(t => {
+        if (!current_types.includes(t)) {
+            let row = frm.add_child('offal_returns');
+            row.offal_type = t;
+            row.weight_kgs = 0.0;
+        }
+    });
+    frm.refresh_field('offal_returns');
 }
 
 function calculate_totals(frm) {
@@ -189,18 +208,6 @@ function calculate_totals(frm) {
     frm.set_value('total_bags', total_bags);
     frm.set_value('total_kgs', total_kgs);
     frm.set_value('units_per_kg', total_kgs > 0 ? parseFloat((total_units / total_kgs).toFixed(3)) : 0);
-
-    let base = frm.expected_birds || 0;
-    calculate_variance(frm, base);
-}
-
-function calculate_variance(frm, base) {
-    ['heads', 'feet', 'giz', 'neck', 'liver', 'heart', 'crop', 'casings'].forEach(part => {
-        let actual = parseInt(frm.doc[part] || 0);
-        let expected = (part === 'feet') ? base * 2 : base;
-        // Variance = Expected - Actual (shows remaining count)
-        frm.set_value('variance_' + part, expected - actual);
-    });
 }
 
 function show_processing_selection_dialog(frm) {
@@ -318,6 +325,24 @@ function render_custom_form(frm) {
         }
         
         .rcv-body .frappe-control { margin-bottom: 10px; }
+
+        .offal-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            background: #f8fafc;
+            height: 100%;
+        }
+        .offal-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
     </style>
 
     <div class="dc-card">
@@ -362,29 +387,13 @@ function render_custom_form(frm) {
     </div>
 
     <div class="dc-card">
-        <div class="dc-head"><div class="dc-title">🥩 Offals & Variances</div></div>
+        <div class="dc-head"><div class="dc-title">🥩 Offal & Parts</div></div>
         <div class="dc-body">
             <div class="row">
-                <div class="col-md-6">
-                    <div class="offal-card">
-                        <div class="offal-title">Actual Returns</div>
-                        <div class="row">
-                            <div class="col-xs-6 col-sm-4" id="ph-heads"></div><div class="col-xs-6 col-sm-4" id="ph-feet"></div>
-                            <div class="col-xs-6 col-sm-4" id="ph-giz"></div><div class="col-xs-6 col-sm-4" id="ph-neck"></div>
-                            <div class="col-xs-6 col-sm-4" id="ph-liver"></div><div class="col-xs-6 col-sm-4" id="ph-heart"></div>
-                            <div class="col-xs-6 col-sm-4" id="ph-crop"></div><div class="col-xs-6 col-sm-4" id="ph-casings"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="offal-card" style="background:#fff;border-color:#f1f5f9;">
-                        <div class="offal-title">Calculated Variances</div>
-                        <div class="row">
-                            <div class="col-xs-6 col-sm-4" id="ph-variance_heads"></div><div class="col-xs-6 col-sm-4" id="ph-variance_feet"></div>
-                            <div class="col-xs-6 col-sm-4" id="ph-variance_giz"></div><div class="col-xs-6 col-sm-4" id="ph-variance_neck"></div>
-                            <div class="col-xs-6 col-sm-4" id="ph-variance_liver"></div><div class="col-xs-6 col-sm-4" id="ph-variance_heart"></div>
-                            <div class="col-xs-6 col-sm-4" id="ph-variance_crop"></div><div class="col-xs-6 col-sm-4" id="ph-variance_casings"></div>
-                        </div>
+                <div class="col-md-12">
+                    <div class="offal-card" style="background:#fff;border-color:#e2e8f0;">
+                        <div class="offal-title">Actual Returns (KGs)</div>
+                        <div id="ph-offal_returns"></div>
                     </div>
                 </div>
             </div>
@@ -396,6 +405,7 @@ function render_custom_form(frm) {
         <div class="dc-body">
             <div class="row" style="padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid #e2e8f0;">
                 <div class="col-xs-6 col-md-3" id="ph-total_bags"></div><div class="col-xs-6 col-md-3" id="ph-total_units"></div>
+                <div class="col-xs-6 col-md-3" id="ph-total_kgs"></div>
                 <div class="col-xs-6 col-md-3" id="ph-units_per_kg"></div>
             </div>
             <div class="row">
@@ -417,10 +427,8 @@ function render_custom_form(frm) {
 
     let move_fields = [
         'date', 'time', 'sheet_no', 'customer_name', 'product', 'linked_receiving',
-        'heads', 'feet', 'giz', 'neck', 'liver', 'heart', 'crop', 'casings',
-        'variance_heads', 'variance_feet', 'variance_giz', 'variance_neck',
-        'variance_liver', 'variance_heart', 'variance_crop', 'variance_casings',
-        'total_bags', 'total_units', 'units_per_kg',
+        'offal_returns',
+        'total_bags', 'total_units', 'total_kgs', 'units_per_kg',
         'customer_rep', 'foreperson', 'security',
         'weight_label_1', 'processing_items_1', 'weight_label_2', 'processing_items_2',
         'weight_label_3', 'processing_items_3', 'weight_label_4', 'processing_items_4',

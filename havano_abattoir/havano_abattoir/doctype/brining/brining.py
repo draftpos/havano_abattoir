@@ -11,9 +11,9 @@ class Brining(Document):
             self.calculate_brining_difference()
 
     def on_submit(self):
-        # Push to Storage automatically after brining
-        from havano_abattoir.havano_abattoir.doctype.processing.processing import push_to_storage
-        push_to_storage(self, "linked_brining")
+        # Push to Blast Freezer automatically after brining
+        from havano_abattoir.havano_abattoir.doctype.processing.processing import push_to_blast_freezer
+        push_to_blast_freezer(self, "linked_brining")
 
     def calculate_totals(self):
         total_units = 0
@@ -46,6 +46,7 @@ class Brining(Document):
                 ]
                 orig_kgs = sum(float(row.kg or 0) for tbl in tables for row in (orig.get(tbl) or []))
                 new_kgs  = sum(float(row.kg or 0) for tbl in tables for row in (self.get(tbl) or []))
+                self.fresh_weight = round(orig_kgs, 3)
                 self.brining_kg_difference = round(new_kgs - orig_kgs, 3)
         except Exception:
             pass

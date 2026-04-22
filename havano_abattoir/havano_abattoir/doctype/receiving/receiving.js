@@ -139,6 +139,7 @@ function render_custom_form(frm) {
                 <div style="flex: 1; min-width: 140px;" id="ph-sheet_no"></div>
                 <div style="flex: 2; min-width: 200px;" id="ph-customer_name"></div>
                 <div style="flex: 1; min-width: 140px;" id="ph-ambient_temperature"></div>
+                <div style="flex: 1; min-width: 140px;" id="ph-birds_per_crate"></div>
             </div>
         </div>
     </div>
@@ -149,6 +150,14 @@ function render_custom_form(frm) {
         <div class="rcv-body" style="padding:0;">
             <div id="ph-receiving_items" style="padding:20px;"></div>
             <div id="rcv-table-total"></div>
+        </div>
+    </div>
+
+    <!-- Card 2b: Dead Birds (DOA / DIP) -->
+    <div class="rcv-card">
+        <div class="rcv-head"><div class="rcv-title">💀 Dead Birds (DOA / DIP)</div></div>
+        <div class="rcv-body" style="padding:0;">
+            <div id="ph-dead_birds" style="padding:20px;"></div>
         </div>
     </div>
 
@@ -188,6 +197,8 @@ function render_custom_form(frm) {
                 <div class="col-md-4"><div id="ph-security"></div></div>
             </div>
         </div>
+    </div>
+
     </div>`;
 
     // Initialize root
@@ -204,6 +215,7 @@ function render_custom_form(frm) {
     // Move all scalar fields
     let scalar_fields = [
         'date', 'time', 'sheet_no', 'customer_name', 'ambient_temperature',
+        'birds_per_crate',
         'total_live_birds', 'total_kgs', 'average_live_weight',
         'processing_status', 'customer_rep', 'foreperson', 'security'
     ];
@@ -215,10 +227,15 @@ function render_custom_form(frm) {
         }
     });
 
-    // Move the table
+    // Move the tables
     let t = frm.fields_dict['receiving_items'];
     if (t && t.wrapper) {
         $root.find('#ph-receiving_items').append(t.wrapper);
+    }
+
+    let db = frm.fields_dict['dead_birds'];
+    if (db && db.wrapper) {
+        $root.find('#ph-dead_birds').append(db.wrapper);
     }
 
     // Hide native Frappe chrome
