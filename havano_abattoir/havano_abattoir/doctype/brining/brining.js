@@ -57,11 +57,28 @@ frappe.ui.form.on('Brining', {
 // Brining Items DO NOT auto-update their KGs based on multipliers.
 // They allow manual KG entry only.
 frappe.ui.form.on('Processing Item', {
-    units: function(frm, cdt, cdn) {
-        // Units should be fixed from processing, but we still trigger recalc if changed
+    units: function (frm, cdt, cdn) {
+        let row = frappe.get_doc(cdt, cdn);
+        let table_name = row.parentfield;
+
+        let multiplier_field = table_name.replace('processing_items_', 'weight_label_');
+        if (table_name === 'weight_group_7') multiplier_field = 'weight_group_7_label';
+        if (table_name === 'weight_group_5_copy') multiplier_field = 'weight_group_5_label_copy';
+
+        let label_val = frm.doc[multiplier_field] || "";
+        let multiplier = parseFloat(label_val.toString().replace(',', '.')) || 0;
+
+        // Fallback to fresh avg weight from linked processing
+        if (multiplier === 0 && frm.doc.fresh_weight && frm.doc.total_units > 0) {
+            multiplier = frm.doc.fresh_weight / frm.doc.total_units;
+        }
+
+        if (row.units && multiplier > 0) {
+            frappe.model.set_value(cdt, cdn, 'kg', parseFloat((row.units * multiplier).toFixed(3)));
+        }
         calculate_totals(frm);
     },
-    kg: function(frm, cdt, cdn) {
+    kg: function (frm, cdt, cdn) {
         let row = frappe.get_doc(cdt, cdn);
         if (typeof row.kg === 'string' && row.kg.includes(',')) {
             let val = parseFloat(row.kg.replace(',', '.'));
@@ -72,11 +89,51 @@ frappe.ui.form.on('Processing Item', {
 });
 
 ['processing_items_1','processing_items_2','processing_items_3','processing_items_4','processing_items_7','processing_items_8','weight_group_7','weight_group_5_copy'].forEach(table_name => {
-    frappe.ui.form.on(table_name, {
-        [`${table_name}_add`]: function(frm) { calculate_totals(frm); },
-        [`${table_name}_remove`]: function(frm) { calculate_totals(frm); }
+        frappe.ui.form.on(table_name, {
+            [`${table_name}_add`]: function(frm) { 
+                calculate_totals(frm); 
+                if (typeof update_group_counts === 'function') update_group_counts(frm); 
+            },
+            [`${table_name}_remove`]: function(frm) { 
+                calculate_totals(frm); 
+                if (typeof update_group_counts === 'function') update_group_counts(frm); 
+            }
+        });
     });
+
+// Auto-calculate KG in tables when weight group (label) edited
+frappe.ui.form.on('Brining', {
+    weight_label_1: function(frm) { auto_calc_kg_from_label(frm, 'weight_label_1', 'processing_items_1'); },
+    weight_label_2: function(frm) { auto_calc_kg_from_label(frm, 'weight_label_2', 'processing_items_2'); },
+    weight_label_3: function(frm) { auto_calc_kg_from_label(frm, 'weight_label_3', 'processing_items_3'); },
+    weight_label_4: function(frm) { auto_calc_kg_from_label(frm, 'weight_label_4', 'processing_items_4'); },
+    weight_label_7: function(frm) { auto_calc_kg_from_label(frm, 'weight_label_7', 'processing_items_7'); },
+    weight_label_8: function(frm) { auto_calc_kg_from_label(frm, 'weight_label_8', 'processing_items_8'); },
+    weight_group_7_label: function(frm) { auto_calc_kg_from_label(frm, 'weight_group_7_label', 'weight_group_7'); },
+    weight_group_5_label_copy: function(frm) { auto_calc_kg_from_label(frm, 'weight_group_5_label_copy', 'weight_group_5_copy'); }
 });
+
+function auto_calc_kg_from_label(frm, label_field, table_field) {
+    const label = frm.doc[label_field];
+    const match = label ? label.match(/(\\d+(?:\\.\\d+)?)/) : null;
+    if (!match) return;
+    const per_unit_kg = parseFloat(match[1]);
+    if (isNaN(per_unit_kg)) return;
+    let changed = false;
+    (frm.doc[table_field] || []).forEach(function(row) {
+        const units = parseFloat(row.units || 0);
+        const new_kg = units * per_unit_kg;
+        if (Math.abs((parseFloat(row.kg || 0)) - new_kg) > 0.001) {
+            frappe.model.set_value(row.doctype, row.name, 'kg', parseFloat(new_kg.toFixed(3)));
+            changed = true;
+        }
+    });
+    if (changed) {
+        frm.refresh_field(table_field);
+        calculate_totals(frm);
+        frappe.msgprint(__('KG auto-updated for {0} based on {1} units at {2}kg/unit', [table_field, frm.doc[table_field].length || 0, per_unit_kg]));
+    }
+}
 
 function set_processing_baselines(frm, auto_fill = false) {
     if (auto_fill) {
@@ -182,6 +239,8 @@ function calculate_totals(frm) {
     
     let fresh = frm.doc.fresh_weight || 0;
     frm.set_value('brining_kg_difference', total_kgs - fresh);
+    
+    if (typeof update_group_counts === 'function') update_group_counts(frm);
 }
 
 function render_custom_form(frm) {
@@ -303,16 +362,17 @@ function render_custom_form(frm) {
 
     <div class="dc-card is-collapsed" id="extra-card">
         <div class="dc-head collapsible" onclick="toggle_extra()">
-            <div class="dc-title">📦 Additional Weight Groups (5 – 8)</div>
-            <svg class="chevron" width="18" height="18" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+            <div class="dc-title">📦 Additional Weight Groups (5 – 8) <span id="extra-group-count" style="font-size:12px;color:#64748b">(0 groups)</span></div>
+            <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" style="transition: transform 0.2s;"><path d="M7 10l5 5 5-5z"/></svg>
         </div>
         <div class="dc-body" id="extra-card-body" style="display:none;">
             <div class="wg-grid">
-                <div class="wg-box"><div class="wg-box-title">Group 5</div><div id="ph-weight_label_7"></div><div id="ph-processing_items_7"></div><div id="subtotal-processing_items_7"></div></div>
-                <div class="wg-box"><div class="wg-box-title">Group 6</div><div id="ph-weight_label_8"></div><div id="ph-processing_items_8"></div><div id="subtotal-processing_items_8"></div></div>
-                <div class="wg-box"><div class="wg-box-title">Group 7</div><div id="ph-weight_group_7_label"></div><div id="ph-weight_group_7"></div><div id="subtotal-weight_group_7"></div></div>
-                <div class="wg-box"><div class="wg-box-title">Group 8</div><div id="ph-weight_group_5_label_copy"></div><div id="ph-weight_group_5_copy"></div><div id="subtotal-weight_group_5_copy"></div></div>
+                <div class="wg-box"><div class="wg-box-title">Group 5 <span class="group-empty">(empty)</span></div><div id="ph-weight_label_7"></div><div id="ph-processing_items_7"></div><div id="subtotal-processing_items_7"></div></div>
+                <div class="wg-box"><div class="wg-box-title">Group 6 <span class="group-empty">(empty)</span></div><div id="ph-weight_label_8"></div><div id="ph-processing_items_8"></div><div id="subtotal-processing_items_8"></div></div>
+                <div class="wg-box"><div class="wg-box-title">Group 7 <span class="group-empty">(empty)</span></div><div id="ph-weight_group_7_label"></div><div id="ph-weight_group_7"></div><div id="subtotal-weight_group_7"></div></div>
+                <div class="wg-box"><div class="wg-box-title">Group 8 <span class="group-empty">(empty)</span></div><div id="ph-weight_group_5_label_copy"></div><div id="ph-weight_group_5_copy"></div><div id="subtotal-weight_group_5_copy"></div></div>
             </div>
+            <div style="text-align:center;padding:16px 0;font-style:italic;color:#64748b;font-size:13px;">Click + to add items to any group</div>
         </div>
     </div>
 
@@ -353,15 +413,54 @@ function render_custom_form(frm) {
                 <div class="col-md-4"><div id="ph-security"></div></div>
             </div>
         </div>
+    </div>
+
+    <div class="dc-card" style="border-color: #10b981;">
+        <div class="dc-head"><div class="dc-title">✅ Ready to Submit</div></div>
+        <div class="dc-body text-center" style="padding: 20px;">
+            <button id="brining-submit-btn" class="btn btn-success btn-lg" onclick="frm.savesubmit(); return false;" style="min-width: 200px;">
+                Submit to Blast Freezer <i class="fa fa-arrow-right"></i>
+            </button>
+            <p class="text-muted small mt-2">Data will auto-move to Blast Freezer stage</p>
+        </div>
     </div>`;
 
     let $root = $('<div id="brining-custom-root">').html(html);
     let $page_head = $(frm.wrapper).find('.page-head');
     if ($page_head.length) { $root.insertAfter($page_head); } else { $(frm.wrapper).prepend($root); }
 
-    window.toggle_extra = function () {
-        $('#extra-card').toggleClass('is-collapsed');
-        $('#extra-card-body').slideToggle(200);
+window.toggle_extra = function () {
+        let $card = $('#extra-card');
+        let $body = $('#extra-card-body');
+        let $chevron = $card.find('.chevron');
+        $card.toggleClass('is-collapsed');
+        $body.slideToggle(200);
+        $chevron.css('transform', $card.hasClass('is-collapsed') ? 'rotate(0deg)' : 'rotate(180deg)');
+    };
+
+function update_group_counts(frm) {
+        let extra_tables = ['processing_items_7','processing_items_8','weight_group_7','weight_group_5_copy'];
+        let non_empty = 0;
+        extra_tables.forEach(tn => {
+            let has_rows = (frm.doc[tn] || []).some(r => parseInt(r.units || 0) > 0);
+            if (has_rows) non_empty++;
+            let $box = $(frm.wrapper).find('[data-fieldname="' + tn + '"]').closest('.wg-box');
+            let $empty = $box.find('.group-empty');
+            if (has_rows) {
+                $empty.hide();
+                non_empty++;
+            } else {
+                $empty.show();
+            }
+        });
+        let $count = $('#extra-group-count');
+        if ($count.length) $count.text(`(${non_empty}/4 groups)`);
+        
+        // Auto-expand if any used
+        if (non_empty > 0) {
+            $('#extra-card').removeClass('is-collapsed');
+            $('#extra-card-body').show();
+        }
     };
 
     let move_fields = [
@@ -384,14 +483,37 @@ function render_custom_form(frm) {
         }
     });
 
+    // Add CSS for empty state
+    $('<style>.group-empty { color: #9ca3af; font-size: 11px; font-style: italic; }</style>').appendTo($root);
+    setTimeout(() => { 
+        if (frm.doc && frm.fields_dict) {
+            update_group_counts(frm); 
+            calculate_totals(frm);
+        }
+    }, 500);
+    $(document).on('grid-row-render', () => setTimeout(() => update_group_counts(frm), 100));
+    frappe.realtime.on('doc_update', () => update_group_counts(frm));
+
     $(frm.wrapper).find('.page-form').hide();
     $(frm.wrapper).find('.form-layout').hide();
     $(frm.wrapper).find('.layout-main-section-wrapper').hide();
     $(frm.wrapper).find('.layout-side-section').hide();
 
-    // Make Units Read-Only in all tables
+// Make Units Read-Only in all tables
     let tables = ['processing_items_1','processing_items_2','processing_items_3','processing_items_4','processing_items_7','processing_items_8','weight_group_7','weight_group_5_copy'];
     tables.forEach(table_name => {
         frm.fields_dict[table_name].grid.get_field('units').read_only = 1;
     });
+
+    // Live calc on kg change (for custom UI)
+    const observer = new MutationObserver(() => {
+        $(frm.wrapper).find('.frappe-control[data-fieldname="kg"] input').off('input.brining').on('input.brining paste keyup', function() {
+            let val = $(this).val();
+            if (val.includes(',')) $(this).val(val.replace(',', '.'));
+            setTimeout(() => calculate_totals(frm), 100);
+        });
+        $(frm.wrapper).find('.frappe-control[data-fieldname="units"] input').off('input.brining').on('input.brining', () => setTimeout(() => calculate_totals(frm), 100));
+    });
+    observer.observe(frm.wrapper[0], { childList: true, subtree: true });
+
 }
