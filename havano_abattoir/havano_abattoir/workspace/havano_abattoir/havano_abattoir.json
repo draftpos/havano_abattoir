@@ -1,8 +1,17 @@
 {
  "charts": [
-  { "chart_name": "Receiving Trend", "label": "Receiving Trend" },
-  { "chart_name": "Dispatch Trend", "label": "Processing Trend" },
-  { "chart_name": "Dispatch Type Mix", "label": "Customer Mix (Processing)" }
+  {
+   "chart_name": "Receiving Trend",
+   "label": "Receiving Trend"
+  },
+  {
+   "chart_name": "Dispatch Trend",
+   "label": "Processing Trend"
+  },
+  {
+   "chart_name": "Dispatch Type Mix",
+   "label": "Customer Mix (Processing)"
+  }
  ],
  "content": "[{\"id\":\"header_main\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Havano Abattoir Dashboard</b></span>\",\"col\":12}},{\"id\":\"header_perf\",\"type\":\"header\",\"data\":{\"text\":\"📈 <b>Daily Performance Overview</b>\",\"col\":12}},{\"id\":\"num_rcv_birds\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Birds Received Today\",\"col\":3}},{\"id\":\"num_rcv_today\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Received Today\",\"col\":3}},{\"id\":\"num_dsp_birds\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Birds Dispatched Today\",\"col\":3}},{\"id\":\"num_dsp_today\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Dispatched Today\",\"col\":3}},{\"id\":\"header_shortcuts\",\"type\":\"header\",\"data\":{\"text\":\"📦 <b>Quick Access & Status</b>\",\"col\":12}},{\"id\":\"shortcut_row\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Received (Today)\",\"col\":4}},{\"id\":\"shortcut_row2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Received (This Week)\",\"col\":4}},{\"id\":\"shortcut_row3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Received (This Month)\",\"col\":4}},{\"id\":\"shortcut_row4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dispatched (Today)\",\"col\":3}},{\"id\":\"shortcut_row5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dispatched (This Week)\",\"col\":3}},{\"id\":\"shortcut_row6\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dispatched (This Month)\",\"col\":3}},{\"id\":\"shortcut_stg_on\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Stock On Hand (BF)\",\"col\":3}},{\"id\":\"shortcut_stg_off\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Total Dispatched (HS)\",\"col\":6}},{\"id\":\"shortcut_brine\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Active Brining\",\"col\":6}},{\"id\":\"header_trends\",\"type\":\"header\",\"data\":{\"text\":\"📊 <b>Analytics & Trends</b>\",\"col\":12}},{\"id\":\"chart_r\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Receiving Trend\",\"col\":6}},{\"id\":\"chart_d\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Dispatch Trend\",\"col\":6}},{\"id\":\"chart_pie\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Dispatch Type Mix\",\"col\":12}},{\"id\":\"card_docs\",\"type\":\"card\",\"data\":{\"card_name\":\"Abattoir Documents\",\"col\":12}}]",
  "creation": "2026-04-11 08:35:00.000000",
@@ -44,8 +53,20 @@
    "type": "Link"
   },
   {
+   "label": "Packaging",
+   "link_to": "Packaging",
+   "link_type": "DocType",
+   "type": "Link"
+  },
+  {
    "label": "Holding Store (Final)",
    "link_to": "Holding Store",
+   "link_type": "DocType",
+   "type": "Link"
+  },
+  {
+   "label": "Dispatch",
+   "link_to": "Dispatch",
    "link_type": "DocType",
    "type": "Link"
   },
@@ -53,6 +74,15 @@
    "label": "Havano Abattoir Settings",
    "link_to": "Havano Abattoir Settings",
    "link_type": "DocType",
+   "type": "Link"
+  },
+  {
+   "label": "Receiving to Dispatch Flow Report",
+   "link_to": "Query Report",
+   "link_type": "Report",
+   "params": {
+    "report_name": "Receiving to Dispatch Flow"
+   },
    "type": "Link"
   }
  ],
@@ -65,7 +95,7 @@
  "public": 1,
  "quick_lists": [],
  "roles": [],
- "sequence_id": 1.0,
+ "sequence_id": 1,
  "shortcuts": [
   {
    "color": "Blue",
@@ -90,21 +120,21 @@
   },
   {
    "color": "Green",
-   "label": "Dispatched (Today)",
+   "label": "Processing (Today)",
    "link_to": "Processing",
    "type": "DocType",
    "stats_filter": "{\"date\": [\"timespan\", \"today\"], \"docstatus\": [\"!=\", 2]}"
   },
   {
    "color": "Green",
-   "label": "Dispatched (This Week)",
+   "label": "Processing (This Week)",
    "link_to": "Processing",
    "type": "DocType",
    "stats_filter": "{\"date\": [\"timespan\", \"this week\"], \"docstatus\": [\"!=\", 2]}"
   },
   {
    "color": "Green",
-   "label": "Dispatched (This Month)",
+   "label": "Processing (This Month)",
    "link_to": "Processing",
    "type": "DocType",
    "stats_filter": "{\"date\": [\"timespan\", \"this month\"], \"docstatus\": [\"!=\", 2]}"
@@ -118,10 +148,10 @@
   },
   {
    "color": "Gray",
-   "label": "Total Dispatched (Final)",
+   "label": "Ready for Dispatch (HS)",
    "link_to": "Holding Store",
    "type": "DocType",
-   "stats_filter": "{\"holding_status\": \"Dispatched\", \"docstatus\": 1}"
+   "stats_filter": "{\"holding_status\": \"Ready for Dispatch\", \"docstatus\": 1}"
   },
   {
    "color": "Cyan",
@@ -129,6 +159,13 @@
    "link_to": "Brining",
    "type": "DocType",
    "stats_filter": "{\"docstatus\": 0}"
+  },
+  {
+   "color": "Orange",
+   "label": "Full Pipeline Report",
+   "link_to": "Query Report",
+   "type": "Report",
+   "params": {"report_name": "Receiving to Dispatch Flow"}
   }
  ],
  "title": "Havano Abattoir Dashboard"
