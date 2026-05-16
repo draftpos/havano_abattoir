@@ -1,0 +1,60 @@
+{
+ "actions": [],
+ "creation": "2026-05-16 09:15:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "offal_type",
+  "weight_kgs",
+  "sacks",
+  "packs_per_sack",
+  "total_packs"
+ ],
+ "fields": [
+  {
+   "fieldname": "offal_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Offal Type",
+   "options": "Heads\nFeet\nGiz\nNeck\nLiver\nHeart\nCrop\nCasings",
+   "reqd": 1
+  },
+  {
+   "fieldname": "weight_kgs",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Weight (Kgs)"
+  },
+  {
+   "fieldname": "sacks",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Sacks"
+  },
+  {
+   "fieldname": "packs_per_sack",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Packs per Sack"
+  },
+  {
+   "fieldname": "total_packs",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Total Packs",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "modified": "2026-05-16 09:15:00.000000",
+ "modified_by": "Administrator",
+ "module": "Havano Abattoir",
+ "name": "Chekuda Bin Offal Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

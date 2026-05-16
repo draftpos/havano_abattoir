@@ -136,8 +136,20 @@ function auto_calc_kg_from_label(frm, label_field, table_field) {
 }
 
 function set_processing_baselines(frm, auto_fill = false) {
-    if (auto_fill) {
-        frappe.db.get_doc('Processing', frm.doc.linked_processing).then(proc => {
+    if (!frm.doc.linked_processing) {
+        if (!auto_fill) {
+            if (!frm.doc.offal_returns || frm.doc.offal_returns.length === 0) {
+                setup_offal_returns(frm);
+            }
+            calculate_totals(frm);
+        }
+        return;
+    }
+
+    frappe.db.get_doc('Processing', frm.doc.linked_processing).then(proc => {
+        frm.proc_baselines = proc;
+        
+        if (auto_fill) {
             frm.set_value('sheet_no', proc.sheet_no + '-B');
             frm.set_value('product', proc.product || 'Whole Birds');
             
@@ -179,13 +191,13 @@ function set_processing_baselines(frm, auto_fill = false) {
 
             frm.refresh();
             calculate_totals(frm);
-        });
-    } else {
-        if (!frm.doc.offal_returns || frm.doc.offal_returns.length === 0) {
-            setup_offal_returns(frm);
+        } else {
+            if (!frm.doc.offal_returns || frm.doc.offal_returns.length === 0) {
+                setup_offal_returns(frm);
+            }
+            calculate_totals(frm);
         }
-        calculate_totals(frm);
-    }
+    });
 }
 
 function setup_offal_returns(frm) {
@@ -208,6 +220,14 @@ function calculate_totals(frm) {
     
     tables.forEach(table_name => {
         let sub_u = 0, sub_k = 0;
+        let fresh_sub_k = 0;
+
+        if (frm.proc_baselines && frm.proc_baselines[table_name]) {
+            frm.proc_baselines[table_name].forEach(orig_row => {
+                fresh_sub_k += parseFloat(orig_row.kg || 0);
+            });
+        }
+
         (frm.doc[table_name] || []).forEach(row => {
             let units = parseInt(row.units || 0);
             let kg = row.kg || 0;
@@ -221,12 +241,24 @@ function calculate_totals(frm) {
             if (units > 0) total_bags++;
         });
 
+        let diff_str = '';
+        if (frm.proc_baselines) {
+            let diff = sub_k - fresh_sub_k;
+            if (diff > 0.001) {
+                diff_str = `<span style="color:#10b981; font-weight:700; margin-left:8px;">(+${diff.toFixed(2)} KG)</span>`;
+            } else if (diff < -0.001) {
+                diff_str = `<span style="color:#ef4444; font-weight:700; margin-left:8px;">(${diff.toFixed(2)} KG)</span>`;
+            } else {
+                diff_str = `<span style="color:#94a3b8; margin-left:8px;">(0.00 KG)</span>`;
+            }
+        }
+
         let $st = $(frm.wrapper).find(`#subtotal-${table_name}`);
         if ($st.length) {
             $st.html(`
                 <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:#64748b; padding-top:8px; border-top:1px dashed #cbd5e1; margin-top:8px;">
                     <span>TOTAL:</span>
-                    <span>${sub_u} Units | ${sub_k.toFixed(2)} KG</span>
+                    <span>${sub_u} Units | ${sub_k.toFixed(2)} KG ${diff_str}</span>
                 </div>
             `);
         }

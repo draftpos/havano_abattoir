@@ -42,6 +42,28 @@ frappe.ui.form.on('Dispatch', {
         if (frm.doc.linked_holding_store) {
             set_dispatch_baselines(frm, true);
         }
+    },
+
+    payment_method: function(frm) {
+        if (!['Pay with Birds', 'Pay with Offals and Birds'].includes(frm.doc.payment_method)) {
+            (frm.doc.dispatch_items || []).forEach(row => {
+                if (row.paid_birds) frappe.model.set_value(row.doctype, row.name, 'paid_birds', 0);
+            });
+        }
+        frm.trigger('update_grid_editable');
+        calculate_totals(frm);
+    },
+
+    update_grid_editable: function(frm) {
+        let allow_paid = ['Pay with Birds', 'Pay with Offals and Birds'].includes(frm.doc.payment_method);
+        frm.fields_dict.dispatch_items.grid.get_field('paid_birds').read_only = allow_paid ? 0 : 1;
+        frm.fields_dict.dispatch_items.grid.refresh();
+    }
+});
+
+frappe.ui.form.on('Dispatch Item', {
+    paid_birds: function(frm, cdt, cdn) {
+        calculate_totals(frm);
     }
 });
 
@@ -52,6 +74,10 @@ function set_dispatch_baselines(frm, auto_fill = false) {
         ['customer_name', 'product', 'customer_rep', 'foreperson', 'security', 'total_sacks', 'total_packed_birds', 'total_kgs'].forEach(f => {
             if (hs[f] || auto_fill) frm.set_value(f, hs[f]);
         });
+        
+        if (hs.total_kgs) {
+            frm.original_total_kgs = hs.total_kgs;
+        }
 
         if (hs.sheet_no) {
             frm.set_value('sheet_no', hs.sheet_no.replace('-H', '-DSP'));
@@ -69,7 +95,43 @@ function set_dispatch_baselines(frm, auto_fill = false) {
             });
             frm.refresh_field('dispatch_items');
         }
+
+        if (hs.offal_returns) {
+            frm.clear_table('offal_returns');
+            hs.offal_returns.forEach(row => {
+                let r = frm.add_child('offal_returns');
+                r.offal_type = row.offal_type;
+                r.weight_kgs = row.weight_kgs;
+            });
+            frm.refresh_field('offal_returns');
+        }
+
+        calculate_totals(frm);
+        frm.trigger('update_grid_editable');
     });
+}
+
+function calculate_totals(frm) {
+    let total_sacks = 0, total_birds = 0, total_kgs = 0;
+    let original_total_birds = 0;
+
+    (frm.doc.dispatch_items || []).forEach(row => {
+        total_sacks += (row.no_of_sacks || 0);
+        original_total_birds += (row.total_packed_birds || 0);
+        let net_birds = (row.total_packed_birds || 0) - (row.paid_birds || 0);
+        total_birds += Math.max(0, net_birds);
+    });
+
+    let base_kgs = frm.original_total_kgs || frm.doc.total_kgs || 0;
+    if (base_kgs > 0 && original_total_birds > 0) {
+        total_kgs = (base_kgs / original_total_birds) * total_birds;
+    } else {
+        total_kgs = base_kgs;
+    }
+
+    frm.set_value('total_packed_birds', total_birds);
+    frm.set_value('total_sacks', total_sacks);
+    frm.set_value('total_kgs', total_kgs);
 }
 
 function render_custom_form(frm) {
@@ -114,8 +176,9 @@ function render_custom_form(frm) {
                 <div class="col-xs-12 col-sm-6 col-md-3" id="ph-time"></div>
                 <div class="col-xs-12 col-sm-6 col-md-3" id="ph-sheet_no"></div>
                 <div class="col-xs-12 col-sm-6 col-md-3" id="ph-customer_name"></div>
-                <div class="col-xs-12 col-md-6 mt-3" id="ph-product"></div>
-                <div class="col-xs-12 col-md-6 mt-3" id="ph-linked_holding_store"></div>
+                <div class="col-xs-12 col-md-4 mt-3" id="ph-product"></div>
+                <div class="col-xs-12 col-md-4 mt-3" id="ph-linked_holding_store"></div>
+                <div class="col-xs-12 col-md-4 mt-3" id="ph-payment_method"></div>
             </div>
             <div class="row mt-4" style="padding-top:16px; border-top:1px dashed #e2e8f0;">
                 <div class="col-md-4"><div id="ph-vehicle_no"></div></div>
@@ -129,6 +192,13 @@ function render_custom_form(frm) {
         <div class="dc-head"><div class="dc-title">📋 Items for Dispatch</div></div>
         <div class="dc-body">
             <div id="ph-dispatch_items"></div>
+        </div>
+    </div>
+
+    <div class="dc-card">
+        <div class="dc-head"><div class="dc-title">🥩 Offal Returns</div></div>
+        <div class="dc-body">
+            <div id="ph-offal_returns"></div>
         </div>
     </div>
 
@@ -153,9 +223,9 @@ function render_custom_form(frm) {
     if ($page_head.length) { $root.insertAfter($page_head); } else { $(frm.wrapper).prepend($root); }
 
     let move_fields = [
-        'date', 'time', 'sheet_no', 'customer_name', 'product',
+        'date', 'time', 'sheet_no', 'payment_method', 'customer_name', 'product',
         'linked_holding_store', 'vehicle_no', 'driver_name', 'delivery_note_no',
-        'dispatch_items',
+        'dispatch_items', 'offal_returns',
         'total_sacks', 'total_packed_birds', 'total_kgs',
         'customer_rep', 'foreperson', 'security'
     ];

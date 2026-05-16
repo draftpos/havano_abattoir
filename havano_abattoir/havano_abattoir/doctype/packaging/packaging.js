@@ -140,6 +140,15 @@ function set_packing_baselines(frm) {
                 r.no_of_sacks = Math.ceil(classification_map[label] / birds_per_sack);
                 r.total_packed_birds = classification_map[label];
             });
+            if (bf.offal_returns) {
+                frm.clear_table('offal_returns');
+                bf.offal_returns.forEach(row => {
+                    let r = frm.add_child('offal_returns');
+                    r.offal_type = row.offal_type;
+                    r.weight_kgs = row.weight_kgs;
+                });
+                frm.refresh_field('offal_returns');
+            }
             
             frm.refresh_field('packing_items');
             calculate_totals(frm);
@@ -213,6 +222,13 @@ function render_custom_form(frm) {
     </div>
 
     <div class="dc-card">
+        <div class="dc-head"><div class="dc-title">🥩 Offal Returns</div></div>
+        <div class="dc-body">
+            <div id="ph-offal_returns"></div>
+        </div>
+    </div>
+
+    <div class="dc-card">
         <div class="dc-head"><div class="dc-title">📊 Packaging Totals & Staff</div></div>
         <div class="dc-body">
             <div class="row" style="padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid #e2e8f0;">
@@ -233,7 +249,7 @@ function render_custom_form(frm) {
 
     let move_fields = [
         'date', 'time', 'sheet_no', 'customer_name', 'product',
-        'linked_blast_freezer', 'packing_items',
+        'linked_blast_freezer', 'packing_items', 'offal_returns',
         'total_sacks', 'total_packed_birds',
         'customer_rep', 'foreperson', 'security'
     ];

@@ -21,6 +21,8 @@
   "linked_blast_freezer",
   "section_break_packing",
   "packing_items",
+  "section_break_offal_returns",
+  "offal_returns",
   "section_break_totals",
   "total_sacks",
   "col_break_t1",
@@ -96,6 +98,18 @@
    "fieldtype": "Table",
    "label": "Packing Items",
    "options": "Packing Item"
+  },
+  {
+   "fieldname": "section_break_offal_returns",
+   "fieldtype": "Section Break",
+   "label": "Actual Returns of Offals (in KGs)"
+  },
+  {
+   "fieldname": "offal_returns",
+   "fieldtype": "Table",
+   "label": "Offal Returns",
+   "options": "Offal Return",
+   "read_only": 1
   },
   {
    "fieldname": "section_break_totals",

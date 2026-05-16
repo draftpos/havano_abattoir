@@ -1,0 +1,161 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "HAV-CHB-.YYYY.-.####",
+ "creation": "2026-05-16 09:05:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "transaction_type",
+  "sale_type",
+  "date",
+  "customer_name",
+  "column_break_1",
+  "dispatch_id",
+  "payment_method",
+  "section_break_offals",
+  "offal_payment",
+  "offal_details",
+  "section_break_birds",
+  "bird_payment",
+  "bird_details",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "Receive",
+   "fieldname": "transaction_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Transaction Type",
+   "options": "Receive\nSale",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.transaction_type=='Sale'",
+   "fieldname": "sale_type",
+   "fieldtype": "Select",
+   "label": "Sale Type",
+   "options": "Items\nBulk"
+  },
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "customer_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Customer Name",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "dispatch_id",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Dispatch ID",
+   "options": "Dispatch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "payment_method",
+   "fieldtype": "Data",
+   "label": "Payment Method",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_offals",
+   "fieldtype": "Section Break",
+   "label": "Offal Details"
+  },
+  {
+   "default": "0",
+   "fieldname": "offal_payment",
+   "fieldtype": "Check",
+   "label": "Includes Offals"
+  },
+  {
+   "depends_on": "eval:doc.offal_payment==1",
+   "fieldname": "offal_details",
+   "fieldtype": "Table",
+   "label": "Offal Details",
+   "options": "Chekuda Bin Offal Item"
+  },
+  {
+   "fieldname": "section_break_birds",
+   "fieldtype": "Section Break",
+   "label": "Bird Details"
+  },
+  {
+   "default": "0",
+   "fieldname": "bird_payment",
+   "fieldtype": "Check",
+   "label": "Includes Birds"
+  },
+  {
+   "depends_on": "eval:doc.bird_payment==1",
+   "fieldname": "bird_details",
+   "fieldtype": "Table",
+   "label": "Bird Details",
+   "options": "Chekuda Bin Item"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Chekuda Bin",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "modified": "2026-05-16 09:17:00.000000",
+ "modified_by": "Administrator",
+ "module": "Havano Abattoir",
+ "name": "Chekuda Bin",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
