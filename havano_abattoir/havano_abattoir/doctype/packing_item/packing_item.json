@@ -11,7 +11,9 @@
   "no_of_sacks",
   "birds_per_sack_dropdown",
   "total_packed_birds",
-  "birds_per_sack"
+  "birds_per_sack",
+  "dispatched_sacks",
+  "dispatched_birds"
  ],
  "fields": [
   {
@@ -54,6 +56,20 @@
    "fieldtype": "Int",
    "in_list_view": 1,
    "label": "Total Packed",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "dispatched_sacks",
+   "fieldtype": "Int",
+   "label": "Dispatched Sacks",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "dispatched_birds",
+   "fieldtype": "Int",
+   "label": "Dispatched Birds",
    "read_only": 1
   }
  ],

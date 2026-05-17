@@ -22,6 +22,10 @@ frappe.ui.form.on('Holding Store', {
             set_packing_baselines(frm);
         }
 
+        if (!frm.doc.offal_returns || frm.doc.offal_returns.length === 0) {
+            setup_offal_returns(frm);
+        }
+
         // Filter: Only show submitted Packaging records
         frm.set_query('linked_packaging', function() {
             return {
@@ -110,7 +114,7 @@ function set_packing_baselines(frm, auto_fill = false) {
             frm.refresh_field('packing_items');
         }
         
-        if (pkg.offal_returns) {
+        if (pkg.offal_returns && pkg.offal_returns.length > 0) {
             frm.clear_table('offal_returns');
             pkg.offal_returns.forEach(row => {
                 let r = frm.add_child('offal_returns');
@@ -118,10 +122,25 @@ function set_packing_baselines(frm, auto_fill = false) {
                 r.weight_kgs = row.weight_kgs;
             });
             frm.refresh_field('offal_returns');
+        } else {
+            setup_offal_returns(frm);
         }
         
         calculate_totals(frm);
     });
+}
+
+function setup_offal_returns(frm) {
+    if (!frm.doc.offal_returns || frm.doc.offal_returns.length === 0) {
+        const types = ['Heads', 'Feet', 'Giz', 'Neck', 'Liver', 'Heart', 'Crop', 'Casings'];
+        frm.clear_table('offal_returns');
+        types.forEach(t => {
+            let row = frm.add_child('offal_returns');
+            row.offal_type = t;
+            row.weight_kgs = 0.0;
+        });
+        frm.refresh_field('offal_returns');
+    }
 }
 
 function calculate_totals(frm) {
