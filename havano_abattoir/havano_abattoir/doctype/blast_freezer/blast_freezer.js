@@ -33,6 +33,10 @@ frappe.ui.form.on('Blast Freezer', {
             set_origin_baselines(frm);
         }
 
+        if (!frm.doc.offal_returns || frm.doc.offal_returns.length === 0) {
+            setup_offal_returns(frm);
+        }
+
         // Filter: Only show submitted Processing/Brining records
         ['linked_processing', 'linked_brining'].forEach(f => {
             frm.set_query(f, () => {
@@ -107,8 +111,7 @@ function set_origin_baselines(frm, auto_fill = false) {
         // as data, though the user removed them from the form.
         // We focus on the Offal Returns table now.
         
-        setup_offal_returns(frm);
-        if (src.offal_returns) {
+        if (src.offal_returns && src.offal_returns.length > 0) {
             frm.clear_table('offal_returns');
             src.offal_returns.forEach(row => {
                 let r = frm.add_child('offal_returns');
@@ -116,6 +119,8 @@ function set_origin_baselines(frm, auto_fill = false) {
                 r.weight_kgs = row.weight_kgs;
             });
             frm.refresh_field('offal_returns');
+        } else {
+            setup_offal_returns(frm);
         }
 
         if (auto_fill) frm.refresh_fields(['customer_name', 'customer_rep', 'foreperson', 'security']);
