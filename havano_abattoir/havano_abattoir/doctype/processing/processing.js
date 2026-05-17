@@ -39,6 +39,10 @@ frappe.ui.form.on('Processing', {
         if (frm.doc.linked_receiving) {
             set_receiving_baselines(frm);
         }
+
+        if (!frm.doc.offal_returns || frm.doc.offal_returns.length === 0) {
+            setup_offal_returns(frm);
+        }
     },
 
     on_submit: function (frm) {
