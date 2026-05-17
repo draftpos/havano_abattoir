@@ -18,6 +18,10 @@ frappe.ui.form.on('Packaging', {
             set_packing_baselines(frm);
         }
 
+        if (!frm.doc.offal_returns || frm.doc.offal_returns.length === 0) {
+            setup_offal_returns(frm);
+        }
+
         // Filter: Only show submitted Blast Freezer records that are not yet packed
         frm.set_query('linked_blast_freezer', function() {
             return {
@@ -140,7 +144,7 @@ function set_packing_baselines(frm) {
                 r.no_of_sacks = Math.ceil(classification_map[label] / birds_per_sack);
                 r.total_packed_birds = classification_map[label];
             });
-            if (bf.offal_returns) {
+            if (bf.offal_returns && bf.offal_returns.length > 0) {
                 frm.clear_table('offal_returns');
                 bf.offal_returns.forEach(row => {
                     let r = frm.add_child('offal_returns');
@@ -148,12 +152,27 @@ function set_packing_baselines(frm) {
                     r.weight_kgs = row.weight_kgs;
                 });
                 frm.refresh_field('offal_returns');
+            } else {
+                setup_offal_returns(frm);
             }
             
             frm.refresh_field('packing_items');
             calculate_totals(frm);
         });
     });
+}
+
+function setup_offal_returns(frm) {
+    if (!frm.doc.offal_returns || frm.doc.offal_returns.length === 0) {
+        const types = ['Heads', 'Feet', 'Giz', 'Neck', 'Liver', 'Heart', 'Crop', 'Casings'];
+        frm.clear_table('offal_returns');
+        types.forEach(t => {
+            let row = frm.add_child('offal_returns');
+            row.offal_type = t;
+            row.weight_kgs = 0.0;
+        });
+        frm.refresh_field('offal_returns');
+    }
 }
 
 function calculate_totals(frm) {
