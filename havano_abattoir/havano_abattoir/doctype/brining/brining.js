@@ -29,6 +29,10 @@ frappe.ui.form.on('Brining', {
             set_processing_baselines(frm);
         }
 
+        if (!frm.doc.offal_returns || frm.doc.offal_returns.length === 0) {
+            setup_offal_returns(frm);
+        }
+
         // Filter: Only show submitted Processing records
         frm.set_query('linked_processing', function() {
             return {
@@ -182,12 +186,16 @@ function set_processing_baselines(frm, auto_fill = false) {
             frm.refresh_fields();
 
             // Copy Offal Returns table
-            frm.clear_table('offal_returns');
-            (proc.offal_returns || []).forEach(row => {
-                let r = frm.add_child('offal_returns');
-                r.offal_type = row.offal_type;
-                r.weight_kgs = row.weight_kgs;
-            });
+            if (proc.offal_returns && proc.offal_returns.length > 0) {
+                frm.clear_table('offal_returns');
+                proc.offal_returns.forEach(row => {
+                    let r = frm.add_child('offal_returns');
+                    r.offal_type = row.offal_type;
+                    r.weight_kgs = row.weight_kgs;
+                });
+            } else {
+                setup_offal_returns(frm);
+            }
 
             frm.refresh();
             calculate_totals(frm);

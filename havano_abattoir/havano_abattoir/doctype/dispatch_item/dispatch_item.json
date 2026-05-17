@@ -30,15 +30,13 @@
    "fieldname": "no_of_sacks",
    "fieldtype": "Int",
    "in_list_view": 1,
-   "label": "No of Sacks",
-   "read_only": 1
+   "label": "No of Sacks"
   },
   {
    "fieldname": "total_packed_birds",
    "fieldtype": "Int",
    "in_list_view": 1,
-   "label": "Total Packed Birds",
-   "read_only": 1
+   "label": "Total Packed Birds"
   },
   {
    "fieldname": "paid_birds",

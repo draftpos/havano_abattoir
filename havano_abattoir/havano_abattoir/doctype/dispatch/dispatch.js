@@ -22,6 +22,10 @@ frappe.ui.form.on('Dispatch', {
                 ]
             };
         });
+
+        if (!frm.doc.offal_returns || frm.doc.offal_returns.length === 0) {
+            setup_offal_returns(frm);
+        }
     },
 
     on_submit: function(frm) {
@@ -62,6 +66,13 @@ frappe.ui.form.on('Dispatch', {
 });
 
 frappe.ui.form.on('Dispatch Item', {
+    no_of_sacks: function(frm, cdt, cdn) {
+        let row = frappe.get_doc(cdt, cdn);
+        if (row.no_of_sacks !== undefined && row.birds_per_sack) {
+            frappe.model.set_value(cdt, cdn, 'total_packed_birds', row.no_of_sacks * row.birds_per_sack);
+        }
+        calculate_totals(frm);
+    },
     paid_birds: function(frm, cdt, cdn) {
         calculate_totals(frm);
     }
@@ -87,16 +98,21 @@ function set_dispatch_baselines(frm, auto_fill = false) {
         if (hs.packing_items) {
             frm.clear_table('dispatch_items');
             hs.packing_items.forEach(row => {
-                let r = frm.add_child('dispatch_items');
-                r.classification = row.classification;
-                r.birds_per_sack = row.birds_per_sack;
-                r.no_of_sacks = row.no_of_sacks;
-                r.total_packed_birds = row.total_packed_birds;
+                let remaining_sacks = (row.no_of_sacks || 0) - (row.dispatched_sacks || 0);
+                let remaining_birds = (row.total_packed_birds || 0) - (row.dispatched_birds || 0);
+                
+                if (remaining_sacks > 0 || remaining_birds > 0) {
+                    let r = frm.add_child('dispatch_items');
+                    r.classification = row.classification;
+                    r.birds_per_sack = row.birds_per_sack;
+                    r.no_of_sacks = remaining_sacks;
+                    r.total_packed_birds = remaining_birds;
+                }
             });
             frm.refresh_field('dispatch_items');
         }
 
-        if (hs.offal_returns) {
+        if (hs.offal_returns && hs.offal_returns.length > 0) {
             frm.clear_table('offal_returns');
             hs.offal_returns.forEach(row => {
                 let r = frm.add_child('offal_returns');
@@ -104,11 +120,26 @@ function set_dispatch_baselines(frm, auto_fill = false) {
                 r.weight_kgs = row.weight_kgs;
             });
             frm.refresh_field('offal_returns');
+        } else {
+            setup_offal_returns(frm);
         }
 
         calculate_totals(frm);
         frm.trigger('update_grid_editable');
     });
+}
+
+function setup_offal_returns(frm) {
+    if (!frm.doc.offal_returns || frm.doc.offal_returns.length === 0) {
+        const types = ['Heads', 'Feet', 'Giz', 'Neck', 'Liver', 'Heart', 'Crop', 'Casings'];
+        frm.clear_table('offal_returns');
+        types.forEach(t => {
+            let row = frm.add_child('offal_returns');
+            row.offal_type = t;
+            row.weight_kgs = 0.0;
+        });
+        frm.refresh_field('offal_returns');
+    }
 }
 
 function calculate_totals(frm) {
@@ -235,6 +266,8 @@ function render_custom_form(frm) {
         if (f && f.wrapper) {
             $root.find('#ph-' + fname).append(f.wrapper);
             $(f.wrapper).css('margin-bottom', '0');
+        } else {
+            console.log("Custom UI: Could not find field or wrapper for:", fname);
         }
     });
 
